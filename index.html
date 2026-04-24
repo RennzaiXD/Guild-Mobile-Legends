@@ -613,9 +613,12 @@
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+
 .btn-daftar {
-  display: inline-block;
-  margin-top: 10px;
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 101;
   padding: 8px 20px;
   background: #FFD700;
   color: #0a0800;
@@ -707,8 +710,6 @@
 <!-- NAV -->
 <nav>
   <div class="nav-brand">SYZEN ID</div>
-  <button class="btn-daftar" onclick="bukaModal()">🖊 Daftar</button>
-  </div>
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
     <li><a href="#leaders">Leader</a></li>
@@ -720,6 +721,7 @@
     <span class="live-text">Active</span>
   </div>
 </nav>
+<button class="btn-daftar" onclick="bukaModal()">🖊 Daftar</button>
 
 <!-- INFO PANEL (baru) -->
 <div id="info-panel" class="info-panel">
