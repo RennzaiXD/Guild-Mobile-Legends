@@ -94,8 +94,8 @@
     .corner-br { bottom: 30px; right: 30px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
 
     .logo-container {
-      width: 160px; height: 160px;
-      border-radius: 50%;
+      width: 100px; height: 100px;
+      border-radius: 55%;
       border: 3px solid var(--gold);
       box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15), inset 0 0 30px rgba(255,215,0,0.05);
       margin: 0 auto 30px;
@@ -105,6 +105,91 @@
       animation: logoPulse 3s ease-in-out infinite;
       position: relative;
     }
+    
+    .collab-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  margin: 0 auto 30px;
+  flex-wrap: wrap;
+}
+
+.collab-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin: 0 auto 30px;
+  flex-wrap: nowrap;
+}
+
+.logo-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logo-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.syzen-logo {
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15);
+  background: var(--dark2);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+.ares-logo {
+  border: 3px solid #00C8FF;
+  box-shadow: 0 0 40px rgba(0,200,255,0.4), 0 0 80px rgba(0,150,255,0.15);
+  background: var(--dark2);
+  animation: aresPulse 3s ease-in-out infinite;
+}
+
+@keyframes aresPulse {
+  0%,100% { box-shadow: 0 0 40px rgba(0,200,255,0.4), 0 0 80px rgba(0,150,255,0.15); }
+  50%      { box-shadow: 0 0 60px rgba(0,200,255,0.7), 0 0 120px rgba(0,150,255,0.3); }
+}
+
+.collab-x {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.collab-x span {
+  font-family: 'Orbitron', monospace;
+  font-size: 3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--gold) 0%, #ff6b00 50%, #00C8FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(255,215,0,0.5)) drop-shadow(0 0 20px rgba(0,200,255,0.4));
+  animation: xPulse 2s ease-in-out infinite;
+}
+
+@keyframes xPulse {
+  0%,100% { filter: drop-shadow(0 0 12px rgba(255,215,0,0.5)) drop-shadow(0 0 20px rgba(0,200,255,0.4)); }
+  50%      { filter: drop-shadow(0 0 24px rgba(255,215,0,0.9)) drop-shadow(0 0 36px rgba(0,200,255,0.8)); }
+}
+    
     @keyframes logoPulse {
       0%,100% { box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15); }
       50%      { box-shadow: 0 0 60px rgba(255,215,0,0.7), 0 0 120px rgba(255,215,0,0.3); }
@@ -124,6 +209,51 @@
       margin-bottom: 12px;
       animation: fadeIn 1s ease;
     }
+
+.collab-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.title-syzen {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.8rem, 7vw, 5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #FFF0A0, #FFD700, #B8860B);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
+  line-height: 1;
+}
+
+.title-x {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1rem, 4vw, 2rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #FFD700 0%, #ff6b00 50%, #00C8FF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 16px rgba(0,200,255,0.5));
+  animation: xPulse 2s ease-in-out infinite;
+  line-height: 1.4;
+}
+
+.title-ares {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.8rem, 7vw, 5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #00FFFF, #00C8FF, #0066FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px rgba(0,200,255,0.6));
+  line-height: 1;
+}
 
     h1 {
       font-family: 'Orbitron', monospace;
@@ -509,13 +639,12 @@
 
     /* ══ NAV ══ */
     nav {
-      position: fixed; top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 16px 40px;
-      display: flex; align-items: center; justify-content: space-between;
-      background: linear-gradient(180deg, rgba(5,5,8,0.95) 0%, transparent 100%);
-      backdrop-filter: blur(4px);
-    }
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 16px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(180deg, rgba(5,5,8,0.95) 0%, rgba(5,5,8,0.6) 70%, transparent 100%);
+}
     .nav-brand {
       font-family: 'Orbitron', monospace;
       font-size: 1rem;
@@ -612,9 +741,78 @@
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    /* ── SIDEBAR NAV ── */
 
+  .sidebar-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: auto !important;
+  transform: none !important;
+  z-index: 102;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  background: rgba(5,5,8,0.95);
+  border-top: 1px solid rgba(255,215,0,0.2);
+}
 
-.btn-daftar {
+.sidebar-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-decoration: none;
+  width: 25%;
+  padding: 10px 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.sidebar-link:active {
+  background: rgba(255,215,0,0.08);
+}
+
+.sidebar-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.sidebar-label {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: rgba(255,215,0,0.6);
+  text-transform: uppercase;
+  opacity: 1;
+  margin-left: 0;
+  pointer-events: none;
+}
+
+.sidebar-link.open .sidebar-label,
+.sidebar-link.open {
+  color: var(--gold);
+}
+
+.sidebar-link.open .sidebar-label {
+  color: var(--gold);
+  opacity: 1;
+}
+
+@media (min-width: 769px) {
+  .sidebar-nav { display: none; }
+}
+    
+    .btn-daftar {
   position: fixed;
   top: 60px;
   right: 20px;
@@ -700,6 +898,96 @@
   transition: box-shadow 0.2s;
 }
 .modal-btns .btn-iya:hover { box-shadow: 0 0 24px rgba(255,215,0,0.7); }
+
+.btn-event {
+  position: fixed;
+  top: 60px;
+  left: 20px;
+  z-index: 101;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #00C8FF, #0066FF);
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(0,150,255,0.5);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.btn-event:hover {
+  box-shadow: 0 0 24px rgba(0,150,255,0.8);
+  transform: translateY(-1px);
+}
+
+.modal-event-box {
+  background: #0D0D14;
+  border: 1px solid rgba(0,200,255,0.4);
+  border-radius: 8px;
+  padding: 36px 32px;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,150,255,0.15);
+}
+.modal-event-box h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  color: #00C8FF;
+  letter-spacing: 3px;
+  margin-bottom: 20px;
+}
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+.event-item {
+  background: rgba(0,200,255,0.05);
+  border: 1px solid rgba(0,200,255,0.2);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.event-item .event-nama {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.8rem;
+  color: #00C8FF;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.event-item .event-tanggal {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.event-item .event-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.6;
+}
+.btn-tutup-event {
+  padding: 10px 28px;
+  background: transparent;
+  border: 1px solid rgba(0,200,255,0.3);
+  color: #00C8FF;
+  border-radius: 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.btn-tutup-event:hover {
+  border-color: #00C8FF;
+  box-shadow: 0 0 12px rgba(0,200,255,0.3);
+}
   </style>
 </head>
 <body>
@@ -709,7 +997,9 @@
 
 <!-- NAV -->
 <nav>
+  <div>
   <div class="nav-brand">SYZEN ID</div>
+  </div>
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
     <li><a href="#leaders">Leader</a></li>
@@ -721,8 +1011,27 @@
     <span class="live-text">Active</span>
   </div>
 </nav>
-<button class="btn-daftar" onclick="bukaModal()">🖊 Daftar</button>
-
+  <!-- SIDEBAR NAV (HP) -->
+<nav class="sidebar-nav">
+  <a class="sidebar-link" href="#home">
+    <span class="sidebar-icon">🏠</span>
+    <span class="sidebar-label">Beranda</span>
+  </a>
+  <a class="sidebar-link" href="#leaders">
+    <span class="sidebar-icon">👑</span>
+    <span class="sidebar-label">Leaders</span>
+  </a>
+  <a class="sidebar-link" href="#members">
+    <span class="sidebar-icon">🛡️</span>
+    <span class="sidebar-label">Anggota</span>
+  </a>
+  <a class="sidebar-link" href="#about">
+    <span class="sidebar-icon">⚔️</span>
+    <span class="sidebar-label">Tentang</span>
+  </a>
+</nav>
+  <button class="btn-daftar" onclick="bukaModal()">🖊 Daftar</button>
+  <button class="btn-event" onclick="bukaEvent()">📅 Event</button>
 <!-- INFO PANEL (baru) -->
 <div id="info-panel" class="info-panel">
   <div class="info-panel-header">
@@ -750,13 +1059,30 @@
     <div class="corner corner-br"></div>
 
     <!-- LOGO -->
-    <div class="logo-container">
-      <img src="SYZENID.png" alt="SYZEN ID Logo">
-    </div>
+    <div class="collab-logos">
+  <!-- Logo SYZEN ID -->
+  <div class="logo-container syzen-logo">
+    <img src="SYZENID.png" alt="SYZEN ID Logo">
+  </div>
+
+  <!-- Huruf X -->
+  <div class="collab-x">
+    <span>X</span>
+  </div>
+
+  <!-- Logo ARES ODYSSEY -->
+  <div class="logo-container ares-logo">
+    <img src="ARESODYSSEY.jpg" alt="ARES Odyssey Logo">
+  </div>
+</div>
 
     <span class="tag-line">Mobile Legends • Indonesia</span>
-    <h1>SYZEN ID</h1>
-    <p class="subtitle">Squad • Kompetitif</p>
+  <div class="collab-title">
+  <h1 class="title-syzen">SYZEN ID</h1>
+  <div class="title-x">X</div>
+  <h1 class="title-ares">ARES ODYSSEY</h1>
+</div>
+<p class="subtitle">Squad • Kompetitif</p>
 
     <div class="hero-divider">
       <span></span>
@@ -1024,7 +1350,7 @@
   <div class="footer-sub">Mobile Legends Squad • Indonesia</div>
   <div class="footer-copy">© 2025 - 2026 SYZEN ID. All rights reserved.</div>
 </footer>
-
+ <!-- Modal Daftar -->
 <div class="modal-overlay" id="modalDaftar">
   <div class="modal-box">
     <p>Anda ingin nama anda masuk di guild ini?<br>Klik Tombol <strong style="color:#FFD700">Iya</strong> dan mulai daftar!</p>
@@ -1032,6 +1358,29 @@
       <button class="btn-tidak" onclick="tutupModal()">Tidak</button>
       <button class="btn-iya" onclick="pergiDaftar()">Iya</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Event -->
+<div class="modal-overlay" id="modalEvent">
+  <div class="modal-event-box">
+    <h3>📅 EVENT SYZEN ID</h3>
+    <div class="event-list">
+
+      <div class="event-item">
+        <div class="event-nama">⚡ SYZEN ID × ARES ODYSSEY</div>
+        <div class="event-tanggal">📅 Jum'at, 24 April 2026</div>
+        <div class="event-desc">Collab perdana antara SYZEN ID dan ARES ODYSSEY. Selama 2 bulan.</div>
+      </div>
+
+      <div class="event-item">
+        <div class="event-nama">Coming Soon...</div>
+        <div class="event-tanggal">📅 ?, ?? ? ????</div>
+        <div class="event-desc">Coming Soon...</div>
+      </div>
+
+    </div>
+    <button class="btn-tutup-event" onclick="tutupEvent()">Tutup</button>
   </div>
 </div>
 <script>
@@ -1123,8 +1472,8 @@
       panel.style.display = 'none';
     }
   });
-
-function bukaModal() {
+  
+  function bukaModal() {
   document.getElementById('modalDaftar').classList.add('active');
 }
 function tutupModal() {
@@ -1134,6 +1483,26 @@ function pergiDaftar() {
   window.open('https://rennzaixd.github.io/Pendaftaran-Guild/index.html', '_blank');
   tutupModal();
 }
+
+function bukaEvent() {
+  document.getElementById('modalEvent').classList.add('active');
+}
+function tutupEvent() {
+  document.getElementById('modalEvent').classList.remove('active');
+}
+
+// Klik di luar modal event = tutup
+document.getElementById('modalEvent').addEventListener('click', function(e) {
+  if(e.target === this) tutupEvent();
+});
+
+// ── BOTTOM NAV ──
+document.querySelectorAll('.sidebar-link').forEach(link => {
+  link.addEventListener('click', function() {
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('open'));
+    this.classList.add('open');
+  });
+});
 </script>
 
 </body>
