@@ -1052,6 +1052,135 @@
   border-color: #00C8FF;
   box-shadow: 0 0 12px rgba(0,200,255,0.3);
 }
+
+/* TOMBOL FLOATING BAWAH - BERSERANGAN */
+.floating-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 999;
+  pointer-events: none; /* biar container ga menghalangi klik */
+}
+
+.floating-btn {
+  pointer-events: auto; /* tombol tetap bisa diklik */
+  padding: 12px 24px;
+  border: none;
+  border-radius: 40px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+}
+
+.daftar-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #0a0800;
+  border: 1px solid rgba(255,215,0,0.6);
+}
+
+.event-btn {
+  background: linear-gradient(135deg, #00C8FF, #0066FF);
+  color: white;
+  border: 1px solid rgba(0,200,255,0.6);
+}
+
+.floating-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+/* TOMBOL FLOATING BAWAH - BERSERANGAN */
+.floating-buttons {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 999;
+  pointer-events: none; /* biar container ga menghalangi klik */
+  
+  /* Animasi hilang/muncul */
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Saat muncul (visible) */
+.floating-buttons.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto; /* KALAU MUNCUL, BISA DIKLIK */
+}
+
+/* Saat hilang (gak punya class visible) */
+.floating-buttons:not(.visible) {
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none; /* ❗ HILANG → TIDAK BISA DIKLIK ❗ */
+}
+
+.floating-btn {
+  pointer-events: auto; /* Ini tetap, tapi tetap terpengaruh parent */
+  padding: 12px 24px;
+  border: none;
+  border-radius: 40px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+}
+
+.daftar-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #0a0800;
+  border: 1px solid rgba(255,215,0,0.6);
+}
+
+.event-btn {
+  background: linear-gradient(135deg, #00C8FF, #0066FF);
+  color: white;
+  border: 1px solid rgba(0,200,255,0.6);
+}
+
+.floating-btn:hover {
+  transform: translateY(-3px);
+  filter: brightness(1.05);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+/* Responsif HP */
+@media (max-width: 768px) {
+  .floating-btn {
+    padding: 10px 20px;
+    font-size: 0.75rem;
+  }
+  .floating-buttons {
+    bottom: 16px;
+    padding: 0 16px;
+  }
+}
+
+/* Sembunyikan tombol daftar/event lama (kalau masih ada) */
+.btn-daftar, .btn-event, .sidebar-nav {
+  display: none !important;
+}
+
   </style>
 </head>
 <body>
@@ -1094,8 +1223,6 @@
     <span class="sidebar-label">Tentang</span>
   </a>
 </nav>
-  <button class="btn-daftar" onclick="bukaModal()">🖊 Daftar</button>
-  <button class="btn-event" onclick="bukaEvent()">📅 Event</button>
 <!-- INFO PANEL (baru) -->
 <div id="info-panel" class="info-panel">
   <div class="info-panel-header">
@@ -1111,7 +1238,15 @@
 </div>
 
 <div class="wrapper">
-
+<!-- TOMBOL FLOATING BAWAH (BERSERANGAN KIRI-KANAN) -->
+<div class="floating-buttons">
+  <button class="floating-btn daftar-btn" onclick="bukaModal()">
+    🖊 Daftar
+  </button>
+  <button class="floating-btn event-btn" onclick="bukaEvent()">
+    📅 Event
+  </button>
+</div>
   <!-- ══ HERO ══ -->
   <header id="home">
     <div class="hero-bg-ring ring1"></div>
@@ -1499,7 +1634,7 @@
   const counterObserver = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
       animateCounter(document.getElementById('counter-member'), 14);
-      animateCounter(document.getElementById('counter-win'), 63, '%');
+      animateCounter(document.getElementById('counter-win'), 61, '%');
       animateCounter(document.getElementById('counter-season'), 40);
       counterObserver.disconnect();
     }
@@ -1576,12 +1711,29 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     this.classList.add('open');
   });
 });
-const MAINTENANCE = true; // ganti true/false aja
+const MAINTENANCE = false; // ganti true/false aja
 
 if (MAINTENANCE) {
   document.getElementById('maintenanceOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
+
+// Animasi floating buttons: Awal muncul, scroll ke bawah jadi hilang
+const floatingBtns = document.querySelector('.floating-buttons');
+
+// Set awal: langsung muncul (bisa diklik)
+floatingBtns.classList.add('visible');
+
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 100) {
+    // Scroll ke bawah > 100px → tombol hilang (ga bisa diklik)
+    floatingBtns.classList.remove('visible');
+  } else {
+    // Scroll ke atas (posisi atas) → tombol muncul lagi (bisa diklik)
+    floatingBtns.classList.add('visible');
+  }
+});
+
 </script>
 
 </body>
