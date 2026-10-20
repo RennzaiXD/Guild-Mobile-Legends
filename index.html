@@ -1,1466 +1,545 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SYZEN ID — Mobile Legends Squad</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <style>
-  .maintenance-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.92);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(8px);
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SYZEN ID — Mobile Legends Squad</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+<script>try{var _g=localStorage.getItem('syzen_gfx');document.documentElement.dataset.gfx=['low','medium','high'].indexOf(_g)>-1?_g:'medium'}catch(e){document.documentElement.dataset.gfx='medium'}</script>
+<style>
+:root{
+  --blue-primary:#0A1931; --blue-accent:#0075FF;
+  --gold:#FFC700; --gold-light:#FFE885; --gold-dark:#B88F00;
+  --white-mecha:#E6F0FA;
+  --dark:#050811; --dark2:#0B132B; --dark3:#1C2541;
+  --silver:#C9D1DB; --bronze:#CD7F32;
+  --grad:linear-gradient(90deg,#0075FF,#FFC700);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--white-mecha);font-family:'Rajdhani',sans-serif;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+   radial-gradient(ellipse 80% 60% at 50% -10%,rgba(0,117,255,.14),transparent 60%),
+   radial-gradient(ellipse 60% 40% at 80% 85%,rgba(255,199,0,.06),transparent 50%),
+   repeating-linear-gradient(0deg,transparent,transparent 80px,rgba(0,117,255,.03) 80px,rgba(0,117,255,.03) 81px),
+   repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(0,117,255,.03) 80px,rgba(0,117,255,.03) 81px)}
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;border-radius:50%;opacity:0;animation:drift linear infinite}
+@keyframes drift{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:.8}90%{opacity:.4}100%{transform:translateY(-10vh) translateX(var(--dx,0));opacity:0}}
+.wrapper{position:relative;z-index:1}
 
-.maintenance-overlay.active { display: flex; }
+/* ── gradient border helper (kartu pimpinan & anggota) ── */
+.leader-card::after,.member-card::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:var(--grad);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;opacity:0;transition:opacity .3s}
 
-.maintenance-box {
-  background: #0D0D14;
-  border: 1px solid rgba(255,45,45,0.5);
-  border-radius: 8px;
-  padding: 40px 32px;
-  max-width: 360px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 0 40px rgba(255,45,45,0.15);
+/* ══ HERO ══ */
+header{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:90px 20px 80px;position:relative}
+.hero-bg-ring{position:absolute;top:50%;left:50%;border-radius:50%;border:1px solid rgba(0,117,255,.12);animation:spin linear infinite}
+.ring1{width:600px;height:600px;animation-duration:40s}
+.ring2{width:800px;height:800px;animation-duration:60s;animation-direction:reverse}
+.ring3{width:1100px;height:1100px;animation-duration:90s;border-color:rgba(255,199,0,.06)}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.corner{position:absolute;width:60px;height:60px;opacity:.45}
+.corner-tl{top:30px;left:30px;border-top:2px solid var(--gold);border-left:2px solid var(--gold)}
+.corner-tr{top:30px;right:30px;border-top:2px solid var(--gold);border-right:2px solid var(--gold)}
+.corner-bl{bottom:30px;left:30px;border-bottom:2px solid var(--gold);border-left:2px solid var(--gold)}
+.corner-br{bottom:30px;right:30px;border-bottom:2px solid var(--gold);border-right:2px solid var(--gold)}
+
+/* Logo: ring gradasi emas → putih → biru tua yang berputar; bagian dalam hitam supaya logo (bg hitam) menyatu.
+   Animasi ikut mode grafik: Low = diam, Medium = putar pelan, High = putar cepat + glow berdenyut */
+.logo-container{position:relative;width:min(170px,46vw);aspect-ratio:1;margin:0 auto 26px;padding:4px;border-radius:50%;overflow:hidden;display:grid;box-shadow:0 0 18px rgba(0,117,255,.45),0 0 36px rgba(255,199,0,.15)}
+.logo-container::before{content:'';position:absolute;inset:-50%;background:conic-gradient(#FFC700,#FFFFFF,#0A3AA8,#FFC700);animation:logoSpin 6s linear infinite;will-change:transform}
+.logo-container img{position:relative;z-index:1;width:100%;height:100%;padding:13%;object-fit:contain;display:block;border-radius:50%;background:#000}
+@keyframes logoSpin{to{transform:rotate(360deg)}}
+@keyframes logoGlow{
+  0%,100%{box-shadow:0 0 14px rgba(0,117,255,.5),0 0 32px rgba(255,199,0,.18)}
+  50%{box-shadow:0 0 24px rgba(0,117,255,.85),0 0 52px rgba(255,199,0,.38)}}
+html[data-gfx="high"] .logo-container::before{animation-duration:3.5s}
+html[data-gfx="high"] .logo-container{animation:logoGlow 3.5s ease-in-out infinite}
+html[data-gfx="low"] .logo-container::before{will-change:auto}
+html[data-gfx="medium"] body.modal-open .logo-container::before{animation-play-state:paused}
+
+.tag-line{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:6px;color:var(--blue-accent);text-transform:uppercase;margin-bottom:12px}
+h1{font-family:'Orbitron',monospace;font-size:clamp(3rem,10vw,7rem);font-weight:900;line-height:.95;letter-spacing:-2px;
+  background:linear-gradient(135deg,#FFFFFF 0%,#FFC700 50%,#0075FF 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 24px rgba(0,117,255,.4));animation:titleReveal 1.2s cubic-bezier(.16,1,.3,1) both}
+@keyframes titleReveal{from{opacity:0;transform:translateY(30px) scale(.95)}to{opacity:1;transform:none}}
+.hero-divider{display:flex;align-items:center;gap:16px;margin:32px auto;width:min(500px,90vw)}
+.hero-divider span{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--blue-accent),transparent)}
+.hero-divider i{color:var(--blue-accent);font-size:20px;font-style:normal}
+.hero-stats{display:flex;gap:40px;justify-content:center;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;color:var(--gold);display:block}
+.stat-label{font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:rgba(230,240,250,.45)}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(0,117,255,.7);font-size:10px;letter-spacing:3px;text-transform:uppercase;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(8px)}}
+.scroll-arrow{width:20px;height:20px;border-right:1px solid var(--blue-accent);border-bottom:1px solid var(--blue-accent);transform:rotate(45deg)}
+
+/* ══ SECTION ══ */
+section{padding:80px 20px;max-width:1200px;margin:0 auto}
+.section-header{text-align:center;margin-bottom:56px}
+.section-tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:5px;color:var(--blue-accent);text-transform:uppercase;display:block;margin-bottom:8px}
+.section-title{font-family:'Orbitron',monospace;font-size:clamp(1.6rem,4vw,2.6rem);font-weight:700;color:var(--gold)}
+.section-line{width:60px;height:2px;background:var(--grad);margin:16px auto 0;border-radius:2px}
+
+/* ══ LEADERS (foto skin, tanpa pop-up) ══ */
+.leaders-grid{display:flex;gap:30px;justify-content:center;flex-wrap:wrap}
+.leader-card{position:relative;flex:1;min-width:260px;max-width:360px;background:var(--dark2);border:1px solid rgba(0,117,255,.2);border-radius:6px;overflow:hidden;text-align:center;transition:transform .3s,box-shadow .3s}
+.leader-card::after{opacity:.6}
+.leader-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 30px rgba(0,117,255,.2)}
+.leader-card:hover::after{opacity:1}
+/* Rasio foto pimpinan 1:1 (kotak) */
+.leader-photo{position:relative;aspect-ratio:1/1;background:linear-gradient(160deg,var(--blue-primary),var(--dark3));display:grid;place-items:center;overflow:hidden}
+.leader-photo .ph{font-size:48px;opacity:.4}
+.leader-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%}
+.leader-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,var(--dark2) 100%)}
+.leader-badge{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:3;background:linear-gradient(90deg,var(--gold-dark),var(--gold));color:var(--dark);font-family:'Orbitron',monospace;font-size:8px;font-weight:900;letter-spacing:2px;padding:4px 12px;border-radius:20px;text-transform:uppercase;white-space:nowrap}
+.leader-badge.wakil{background:linear-gradient(90deg,#8d97a5,var(--silver))}
+.leader-body{position:relative;z-index:2;padding:0 24px 30px;margin-top:-28px}
+.leader-role{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--blue-accent);text-transform:uppercase;margin-bottom:6px}
+.leader-name{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:6px}
+.leader-id{font-family:'Share Tech Mono',monospace;font-size:.75rem;color:rgba(230,240,250,.4);margin-bottom:12px}
+.leader-role-detail{display:inline-block;font-size:.85rem;color:var(--gold-light);background:rgba(255,199,0,.1);border:1px solid rgba(255,199,0,.3);padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.leader-rank{display:flex;width:max-content;margin:0 auto;align-items:center;gap:6px;background:rgba(0,117,255,.1);border:1px solid rgba(0,117,255,.35);padding:4px 14px;border-radius:20px;font-size:.8rem;color:var(--white-mecha)}
+
+/* ══ BEST PLAYER ══ */
+.bp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.bp-card{--c:var(--gold);position:relative;overflow:hidden;background:linear-gradient(180deg,var(--dark3),var(--dark2));border:1px solid var(--c);border-radius:8px;padding:34px 22px 28px;text-align:center;box-shadow:0 0 0 rgba(0,0,0,0)}
+.bp-card.year{--c:var(--gold);box-shadow:0 0 36px rgba(255,199,0,.35),inset 0 0 30px rgba(255,199,0,.07)}
+.bp-card.month{--c:var(--silver);box-shadow:0 0 18px rgba(201,209,219,.18)}
+.bp-card.week{--c:var(--bronze);box-shadow:0 0 18px rgba(205,127,50,.2)}
+.bp-icon{font-size:42px;display:block;margin-bottom:12px}
+.bp-badge{display:inline-block;font-family:'Orbitron',monospace;font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--dark);background:var(--c);padding:5px 14px;border-radius:20px;margin-bottom:16px}
+.bp-name{font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:700;color:var(--c);margin-bottom:14px;word-break:break-word}
+.bp-hero-label{display:block;font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:rgba(230,240,250,.4);margin-bottom:2px}
+.bp-hero{font-size:1.05rem;font-weight:600;color:var(--white-mecha)}
+
+/* ══ MEMBERS ══ */
+.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.member-card{position:relative;background:var(--dark2);border:1px solid rgba(230,240,250,.07);border-radius:6px;padding:20px;display:flex;align-items:center;gap:16px;cursor:pointer;overflow:hidden;transition:background .25s,transform .25s}
+.member-card:hover{background:var(--dark3);transform:translateX(4px)}
+.member-card:hover::after{opacity:1}
+.member-num{font-family:'Orbitron',monospace;font-size:.7rem;color:rgba(0,117,255,.6);min-width:24px}
+.member-avatar-sm{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--dark3),var(--blue-primary));border:1px solid rgba(0,117,255,.35);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.member-info{flex:1;min-width:0}
+.member-name{font-weight:600;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member-pos{font-size:.72rem;color:rgba(230,240,250,.4);letter-spacing:1px}
+.member-status{width:8px;height:8px;border-radius:50%;background:#2ecc71;box-shadow:0 0 6px #2ecc71;flex-shrink:0}
+
+/* ══ ABOUT ══ */
+.about-section{background:var(--dark2);border:1px solid rgba(0,117,255,.18);border-radius:6px;padding:60px 40px;position:relative;overflow:hidden}
+.about-section::before{content:'SYZEN';position:absolute;right:-20px;bottom:-40px;font-family:'Orbitron',monospace;font-size:12rem;font-weight:900;color:rgba(0,117,255,.04);pointer-events:none;line-height:1}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative}
+.about-text h3{font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--gold);margin-bottom:16px}
+.about-text p{color:rgba(230,240,250,.65);line-height:1.8;margin-bottom:14px}
+.about-values{display:flex;flex-direction:column;gap:16px}
+.value-item{display:flex;gap:16px;padding:16px;background:rgba(0,117,255,.05);border:1px solid rgba(0,117,255,.15);border-radius:4px;transition:border-color .3s}
+.value-item:hover{border-color:var(--gold)}
+.value-icon{font-size:24px}
+.value-title{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:4px}
+.value-desc{font-size:.85rem;color:rgba(230,240,250,.5);line-height:1.6}
+
+/* ══ FOOTER ══ */
+footer{border-top:1px solid rgba(0,117,255,.2);padding:40px 20px 110px;text-align:center;position:relative;z-index:1}
+.footer-logo{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:900;background:linear-gradient(90deg,#fff,var(--gold),var(--blue-accent));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.footer-sub{font-size:.75rem;letter-spacing:4px;color:rgba(230,240,250,.3);text-transform:uppercase;margin-bottom:20px}
+.footer-copy{font-size:.75rem;color:rgba(230,240,250,.25)}
+
+/* ══ NAV ══ */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(5,8,17,.96),rgba(5,8,17,.6) 70%,transparent)}
+.nav-brand{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:var(--gold);letter-spacing:2px}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{color:rgba(230,240,250,.55);text-decoration:none;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--blue-accent)}
+.nav-badge{display:flex;align-items:center;gap:8px;background:rgba(0,117,255,.15);border:1px solid rgba(0,117,255,.4);padding:6px 14px;border-radius:20px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--blue-accent);box-shadow:0 0 8px var(--blue-accent);animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.2}}
+.live-text{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--blue-accent)}
+
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ══ MODAL DETAIL PEMAIN (4:3, hanya roster) ══ */
+.pm-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:rgba(5,8,17,.82);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.pm-overlay.active{opacity:1;visibility:visible}
+.pm{position:relative;width:min(92vw,880px,calc(86vh * 4 / 3));aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:linear-gradient(160deg,var(--blue-primary),var(--dark));border:1px solid rgba(0,117,255,.55);box-shadow:0 0 70px rgba(0,117,255,.3),0 0 20px rgba(255,199,0,.12);
+  transform:translateY(40px) scale(.88);opacity:0;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .35s}
+.pm-overlay.active .pm{transform:none;opacity:1}
+.pm-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.12);transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
+.pm-overlay.active .pm-img{transform:scale(1)}
+.pm-fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,8,17,0) 0%,rgba(5,8,17,.2) 38%,rgba(5,8,17,.88) 74%,var(--dark) 100%)}
+.pm-close{position:absolute;top:12px;right:12px;z-index:5;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,199,0,.6);background:rgba(5,8,17,.65);color:var(--gold);font-size:26px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background .2s,box-shadow .2s}
+.pm-close:hover{background:var(--gold);color:var(--dark);box-shadow:0 0 16px rgba(255,199,0,.6)}
+.pm-body{position:absolute;left:0;right:0;bottom:0;padding:clamp(12px,3vw,32px);z-index:2}
+.pm-body>*{opacity:0;transform:translateY(16px);transition:opacity .5s,transform .5s}
+.pm-overlay.active .pm-body>*{opacity:1;transform:none}
+.pm-overlay.active .pm-body>:nth-child(1){transition-delay:.25s}
+.pm-overlay.active .pm-body>:nth-child(2){transition-delay:.33s}
+.pm-overlay.active .pm-body>:nth-child(3){transition-delay:.41s}
+.pm-name{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(1.3rem,5vw,2.8rem);line-height:1.05;color:#fff;text-shadow:0 0 10px var(--blue-accent),0 0 28px rgba(0,117,255,.8)}
+.pm-role{display:inline-block;margin:8px 0 clamp(8px,2vw,16px);font-weight:700;font-size:clamp(.7rem,2vw,.9rem);letter-spacing:1px;color:var(--dark);background:linear-gradient(90deg,var(--gold),var(--gold-light));padding:3px 12px;border-radius:20px}
+.pm-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(5px,1.4vw,12px)}
+.pm-stat{background:rgba(10,25,49,.72);border:1px solid rgba(0,117,255,.4);border-radius:6px;padding:clamp(5px,1.2vw,10px) clamp(7px,1.6vw,12px);backdrop-filter:blur(4px);min-width:0}
+.pm-stat span{display:block;font-family:'Share Tech Mono',monospace;font-size:clamp(.5rem,1.3vw,.65rem);letter-spacing:2px;text-transform:uppercase;color:var(--blue-accent)}
+.pm-stat b{display:block;font-size:clamp(.72rem,1.9vw,1rem);font-weight:600;color:var(--white-mecha);overflow-wrap:anywhere}
+@media(max-width:560px){.pm-stats{grid-template-columns:1fr 1fr}.pm-close{width:34px;height:34px;font-size:22px;top:8px;right:8px}}
+
+/* ══ MODAL DAFTAR / EVENT / MAINTENANCE ══ */
+.modal-overlay,.maintenance-overlay{display:none;position:fixed;inset:0;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.modal-overlay{background:rgba(5,8,17,.7);z-index:999}
+.maintenance-overlay{background:rgba(5,8,17,.94);z-index:9999}
+.modal-overlay.active,.maintenance-overlay.active{display:flex}
+.modal-box,.modal-event-box,.maintenance-box{background:var(--dark2);border-radius:8px;padding:36px 32px;width:90%;text-align:center}
+.modal-box{max-width:380px;border:1px solid rgba(255,199,0,.45);box-shadow:0 0 40px rgba(255,199,0,.15)}
+.modal-event-box{max-width:420px;border:1px solid var(--blue-accent);box-shadow:0 0 40px rgba(0,117,255,.2)}
+.maintenance-box{max-width:360px;border:1px solid rgba(0,117,255,.5);box-shadow:0 0 40px rgba(0,117,255,.2)}
+.modal-box p,.maintenance-box p{font-size:1rem;color:rgba(230,240,250,.75);line-height:1.7;margin-bottom:24px}
+.maintenance-icon{font-size:3rem;display:block;margin-bottom:16px}
+.maintenance-box h2{font-family:'Orbitron',monospace;font-size:.9rem;color:var(--blue-accent);letter-spacing:3px;margin-bottom:16px}
+.modal-btns{display:flex;gap:12px;justify-content:center}
+.btn-tidak,.btn-tutup-event{padding:10px 28px;background:transparent;border-radius:4px;font-family:'Rajdhani',sans-serif;font-size:.95rem;letter-spacing:2px;cursor:pointer;transition:box-shadow .2s,color .2s}
+.btn-tidak{border:1px solid rgba(230,240,250,.25);color:rgba(230,240,250,.6)}
+.btn-tidak:hover{color:#fff;border-color:#fff}
+.btn-iya{padding:10px 28px;background:var(--gold);border:none;color:#0a0800;border-radius:4px;font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;letter-spacing:2px;cursor:pointer;box-shadow:0 0 14px rgba(255,199,0,.4)}
+.modal-event-box h3{font-family:'Orbitron',monospace;font-size:1rem;color:var(--blue-accent);letter-spacing:3px;margin-bottom:20px}
+.event-list{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;text-align:left}
+.event-item{background:rgba(0,117,255,.07);border:1px solid rgba(0,117,255,.3);border-radius:6px;padding:14px 16px}
+.event-nama{font-family:'Orbitron',monospace;font-size:.8rem;font-weight:700;color:var(--gold-light);margin-bottom:4px}
+.event-tanggal{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:rgba(230,240,250,.45);margin-bottom:6px}
+.event-desc{font-size:.85rem;color:rgba(230,240,250,.65);line-height:1.6}
+.btn-tutup-event{border:1px solid var(--blue-accent);color:var(--blue-accent)}
+.btn-tutup-event:hover{box-shadow:0 0 12px rgba(0,117,255,.5)}
+
+/* ══ TOMBOL FLOATING ══ */
+.floating-buttons{position:fixed;bottom:20px;left:0;right:0;display:flex;justify-content:space-between;padding:0 20px;z-index:900;pointer-events:none;opacity:0;transform:translateY(30px);transition:opacity .4s,transform .4s}
+.floating-buttons.visible{opacity:1;transform:none}
+.floating-btn{pointer-events:none;padding:12px 24px;border:none;border-radius:40px;font-family:'Orbitron',monospace;font-weight:700;font-size:.85rem;letter-spacing:1.5px;cursor:pointer;text-decoration:none;box-shadow:0 4px 15px rgba(0,0,0,.45);transition:transform .3s,box-shadow .3s}
+.floating-buttons.visible .floating-btn{pointer-events:auto}
+.floating-btn:hover{transform:translateY(-3px)}
+.daftar-btn{background:linear-gradient(135deg,var(--gold),#FFA500);color:#0a0800;border:1px solid rgba(255,199,0,.6)}
+.event-btn{background:linear-gradient(135deg,var(--blue-accent),#0050B3);color:#fff;border:1px solid rgba(0,117,255,.7)}
+
+@media(max-width:900px){.bp-grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+@media(max-width:768px){
+  nav{padding:14px 20px}.nav-links{display:none}
+  .about-grid{grid-template-columns:1fr;gap:30px}.about-section{padding:40px 24px}
+  .ring1,.ring2,.ring3{display:none}
 }
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
 
-.maintenance-icon {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 16px;
+/* ══ v2.0 — NAV KANAN: INFO + GRAFIK ══ */
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-tools{display:flex;align-items:center;gap:10px}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-info{width:32px;height:32px;border-radius:50%;background:rgba(0,117,255,.15);border:1px solid rgba(0,117,255,.4);cursor:pointer;font-size:14px;line-height:1;display:grid;place-items:center}
+.nav-info:hover{box-shadow:0 0 10px rgba(0,117,255,.6)}
+.gfx{display:flex;border:1px solid rgba(0,117,255,.4);border-radius:20px;overflow:hidden}
+.gfx button{background:transparent;border:none;color:rgba(230,240,250,.6);font-family:'Orbitron',monospace;font-size:.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 10px;cursor:pointer;transition:background .2s,color .2s}
+.gfx button.on{background:var(--blue-accent);color:#fff}
+
+/* ══ v2.0 — AURA ROSTER (Best Player) ══ */
+.member-card.aura-year{--aura:255,199,0}
+.member-card.aura-month{--aura:201,209,219}
+.member-card.aura-week{--aura:205,127,50}
+.member-card[class*="aura-"]{border-color:rgb(var(--aura));box-shadow:0 0 12px rgba(var(--aura),.55),0 0 26px rgba(var(--aura),.3),inset 0 0 12px rgba(var(--aura),.12);animation:auraPulse 2.4s ease-in-out infinite}
+.member-card[class*="aura-"]::after{display:none}
+@keyframes auraPulse{50%{box-shadow:0 0 18px rgba(var(--aura),.85),0 0 42px rgba(var(--aura),.45),inset 0 0 16px rgba(var(--aura),.2)}}
+
+/* ══ v2.0 — FOTO SKIN DI KARTU BEST PLAYER ══ */
+.bp-photo{display:none;position:relative;aspect-ratio:4/3;margin:-34px -22px 16px;overflow:hidden}
+.bp-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bp-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,var(--dark2))}
+.bp-card.has-img .bp-photo{display:block}
+.bp-card.has-img .bp-icon{display:none}
+
+/* ══ v2.0 — BADGE PENGHARGAAN DI MODAL ══ */
+.pm-awards{position:absolute;top:12px;left:12px;z-index:5;display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:calc(100% - 64px)}
+.pm-award{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(.5rem,1.9vw,.75rem);letter-spacing:1.5px;padding:5px 12px;border-radius:20px;background:rgba(5,8,17,.78);border:1px solid currentColor;box-shadow:0 0 12px currentColor;backdrop-filter:blur(4px)}
+.pm-award.year{color:#FFC700}
+.pm-award.month{color:#C9D1DB}
+.pm-award.week{color:#CD7F32}
+
+/* ══ v2.0 — TOP UP TICKER ══ */
+#topup{padding:0 20px 70px}
+.topup-box{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 16px;max-width:760px;margin:0 auto;padding:16px 22px;background:linear-gradient(90deg,rgba(0,117,255,.12),rgba(255,199,0,.08));border:1px solid rgba(0,117,255,.4);border-radius:8px}
+.topup-label{font-family:'Share Tech Mono',monospace;font-size:.85rem;letter-spacing:2px;color:var(--white-mecha)}
+.topup-link{font-family:'Orbitron',monospace;font-weight:700;font-size:1.05rem;color:var(--gold);text-decoration:none;text-shadow:0 0 12px rgba(255,199,0,.45)}
+.topup-link:hover{text-shadow:0 0 18px rgba(255,199,0,.85)}
+.ticker{display:inline-grid;overflow:hidden;line-height:1.8;vertical-align:middle}
+.ticker span{grid-area:1/1;white-space:nowrap;transition:transform .6s cubic-bezier(.22,1,.36,1),opacity .6s}
+.ticker .cur{transform:none;opacity:1}
+.ticker .below{transform:translateY(100%);opacity:0}
+.ticker .above{transform:translateY(-100%);opacity:0}
+.ticker .snap{transition:none}
+
+/* ══ v2.0 — MODAL GRAFIK & PATCH NOTES ══ */
+.mb-title{font-family:'Orbitron',monospace;font-size:1rem;color:var(--gold);letter-spacing:3px;margin-bottom:16px}
+.modal-patch-box{background:var(--dark2);border:1px solid rgba(255,199,0,.45);border-radius:8px;padding:30px 26px;width:90%;max-width:440px;max-height:86vh;overflow:auto;text-align:center;box-shadow:0 0 40px rgba(255,199,0,.15)}
+.patch-list{list-style:none;text-align:left;display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
+.patch-list li{font-size:.95rem;line-height:1.55;color:rgba(230,240,250,.75);padding-left:14px;border-left:2px solid var(--blue-accent)}
+.patch-list b{color:var(--gold-light)}
+.patch-hint{font-size:.8rem;color:rgba(230,240,250,.45);margin-bottom:18px}
+
+/* ══ v2.0 — OPTIMASI GPU ══ */
+.pm{will-change:transform,opacity}
+.pm-overlay{will-change:opacity}
+
+/* ══ v2.0 — MODE GRAFIK ══ */
+/* Low: tanpa partikel, tanpa blur, tanpa animasi/transisi */
+html[data-gfx="low"] *,html[data-gfx="low"] *::before,html[data-gfx="low"] *::after{animation:none!important;transition:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html[data-gfx="low"] .particles,html[data-gfx="low"] .hero-bg-ring{display:none}
+html[data-gfx="low"] h1{filter:none}
+html[data-gfx="low"] .pm,html[data-gfx="low"] .pm-overlay{will-change:auto}
+html[data-gfx="low"] .pm-overlay,html[data-gfx="low"] .modal-overlay{background:rgba(5,8,17,.95)}
+/* Medium: partikel di-pause saat modal profil terbuka */
+html[data-gfx="medium"] body.modal-open .particle{animation-play-state:paused}
+
+@media(max-width:560px){
+  /* HP: baris 1 = SYZEN ID | badge Active, baris 2 = tombol info | grafik (sejajar) */
+  nav{padding:12px 14px;display:grid;grid-template-columns:1fr auto;align-items:center;row-gap:8px}
+  .nav-left,.nav-right{display:contents}
+  .nav-brand{grid-column:1;grid-row:1}
+  .nav-badge{grid-column:2;grid-row:1;justify-self:end}
+  .nav-info{grid-column:1;grid-row:2;justify-self:start}
+  .nav-tools{grid-column:2;grid-row:2;justify-self:end;gap:8px}
+  .gfx button{padding:7px 8px;font-size:.52rem}
+  .nav-brand{font-size:.9rem}
 }
-
-.maintenance-box h2 {
-  font-family: 'Orbitron', monospace;
-  font-size: 0.9rem;
-  color: var(--red);
-  letter-spacing: 3px;
-  margin-bottom: 16px;
-}
-
-.maintenance-box p {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.95rem;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.7;
-  margin-bottom: 24px;
-  letter-spacing: 0.5px;
-}
-
-.btn-kembali {
-  padding: 10px 28px;
-  background: transparent;
-  border: 1px solid rgba(255,45,45,0.5);
-  color: var(--red);
-  border-radius: 4px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.btn-kembali:hover {
-  border-color: var(--red);
-  box-shadow: 0 0 12px rgba(255,45,45,0.3);
-}
-    :root {
-      --gold: #FFD700;
-      --gold-light: #FFF0A0;
-      --gold-dark: #B8860B;
-      --red: #FF2D2D;
-      --red-glow: rgba(255, 45, 45, 0.6);
-      --dark: #050508;
-      --dark2: #0D0D14;
-      --dark3: #12121C;
-      --blue-accent: #00C8FF;
-      --white: #F0F0FF;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--dark);
-      color: var(--white);
-      font-family: 'Rajdhani', sans-serif;
-      overflow-x: hidden;
-      cursor: default;
-    }
-
-    /* ── ANIMATED BG ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,215,0,0.07) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,45,45,0.05) 0%, transparent 50%),
-        repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(255,215,0,0.015) 80px, rgba(255,215,0,0.015) 81px),
-        repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(255,215,0,0.015) 80px, rgba(255,215,0,0.015) 81px);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ── PARTICLES ── */
-    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-    .particle {
-      position: absolute;
-      width: 2px; height: 2px;
-      background: var(--gold);
-      border-radius: 50%;
-      animation: drift linear infinite;
-      opacity: 0;
-    }
-    @keyframes drift {
-      0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
-      10%  { opacity: 0.8; }
-      90%  { opacity: 0.4; }
-      100% { transform: translateY(-10vh) translateX(var(--dx, 0px)); opacity: 0; }
-    }
-
-    /* ── WRAPPER ── */
-    .wrapper { position: relative; z-index: 1; }
-
-    /* ══ HERO / HEADER ══ */
-    header {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 60px 20px 80px;
-      position: relative;
-    }
-
-    .hero-bg-ring {
-      position: absolute;
-      border-radius: 50%;
-      border: 1px solid rgba(255,215,0,0.08);
-      animation: spin linear infinite;
-    }
-    .ring1 { width: 600px; height: 600px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-duration: 40s; }
-    .ring2 { width: 800px; height: 800px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-duration: 60s; animation-direction: reverse; }
-    .ring3 { width: 1100px; height: 1100px; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-duration: 90s; border-color: rgba(255,45,45,0.05); }
-    @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
-
-    /* Decorative corner lines */
-    .corner { position: absolute; width: 60px; height: 60px; opacity: 0.4; }
-    .corner-tl { top: 30px; left: 30px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
-    .corner-tr { top: 30px; right: 30px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
-    .corner-bl { bottom: 30px; left: 30px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
-    .corner-br { bottom: 30px; right: 30px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
-
-    .logo-container {
-      width: 150px; height: 150px;
-      border-radius: 100%;
-      border: 20px solid var(--gold);
-      box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15), inset 0 0 30px rgba(255,215,0,0.05);
-      margin: 0 auto 30px;
-      overflow: hidden;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--dark2);
-      animation: logoPulse 3s ease-in-out infinite;
-      position: relative;
-    }
-    
-.logo-container {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.syzen-logo {
-  border: 3px solid var(--gold);
-  box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15);
-  background: var(--dark2);
-  animation: logoPulse 3s ease-in-out infinite;
-}
-    
-    @keyframes logoPulse {
-      0%,100% { box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15); }
-      50%      { box-shadow: 0 0 60px rgba(255,215,0,0.7), 0 0 120px rgba(255,215,0,0.3); }
-    }
-
-    .logo-container img {
-      width: 130px; height: 130px;
-      object-fit: contain;
-    }
-
-    .tag-line {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 6px;
-      color: var(--red);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      animation: fadeIn 1s ease;
-    }
-
-.title-syzen {
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(1.8rem, 7vw, 5rem);
-  font-weight: 900;
-  background: linear-gradient(135deg, #FFF0A0, #FFD700, #B8860B);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 20px rgba(255,215,0,0.4));
-  line-height: 1;
-}
-
-.title-x {
-  font-family: 'Orbitron', monospace;
-  font-size: clamp(1rem, 4vw, 2rem);
-  font-weight: 900;
-  background: linear-gradient(135deg, #FFD700 0%, #ff6b00 50%, #00C8FF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 16px rgba(0,200,255,0.5));
-  animation: xPulse 2s ease-in-out infinite;
-  line-height: 1.4;
-}
-
-
-    h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(3rem, 10vw, 7rem);
-      font-weight: 900;
-      line-height: 0.9;
-      letter-spacing: -2px;
-      background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 40%, var(--gold-dark) 70%, var(--red) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: none;
-      filter: drop-shadow(0 0 30px rgba(255,215,0,0.5));
-      animation: titleReveal 1.2s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    @keyframes titleReveal {
-      from { opacity: 0; transform: translateY(30px) scale(0.95); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .subtitle {
-      font-size: 1.1rem;
-      letter-spacing: 8px;
-      text-transform: uppercase;
-      color: rgba(255,215,0,0.5);
-      margin-top: 12px;
-      font-weight: 300;
-    }
-
-    .hero-divider {
-      display: flex; align-items: center; gap: 16px;
-      margin: 32px auto;
-      width: min(500px, 90vw);
-    }
-    .hero-divider span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-    .hero-divider i { color: var(--red); font-size: 20px; }
-
-    .hero-stats {
-      display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .stat {
-      text-align: center;
-    }
-    .stat-num {
-      font-family: 'Orbitron', monospace;
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--gold);
-      display: block;
-    }
-    .stat-label {
-      font-size: 0.75rem;
-      letter-spacing: 4px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.4);
-    }
-
-    .scroll-hint {
-      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      color: rgba(255,215,0,0.4);
-      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-      animation: bounce 2s ease-in-out infinite;
-    }
-    @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
-    .scroll-arrow { width: 20px; height: 20px; border-right: 1px solid var(--gold); border-bottom: 1px solid var(--gold); transform: rotate(45deg); opacity: 0.6; }
-
-    /* ══ SECTION SHARED ══ */
-    section {
-      padding: 80px 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 60px;
-    }
-    .section-tag {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 5px;
-      color: var(--red);
-      text-transform: uppercase;
-      display: block;
-      margin-bottom: 8px;
-    }
-    .section-title {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(1.6rem, 4vw, 2.6rem);
-      font-weight: 700;
-      color: var(--gold);
-    }
-    .section-line {
-      width: 60px; height: 2px;
-      background: linear-gradient(90deg, var(--red), var(--gold));
-      margin: 16px auto 0;
-      border-radius: 2px;
-    }
-
-    /* ══ LEADERS ══ */
-    .leaders-grid {
-      display: flex;
-      gap: 30px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 30px;
-    }
-
-    .leader-card {
-      flex: 1;
-      min-width: 260px;
-      max-width: 360px;
-      background: var(--dark2);
-      border: 1px solid rgba(255,215,0,0.2);
-      border-radius: 4px;
-      padding: 40px 30px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .leader-role-detail {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.85rem;
-  color: var(--gold-light);
-  background: rgba(255,215,0,0.1);
-  padding: 4px 10px;
-  border-radius: 20px;
-  display: inline-block;
-  margin: 8px 0 6px 0;
-  border: 1px solid rgba(255,215,0,0.3);
-  letter-spacing: 0.5px;
-}
-    
-    .leader-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--red), var(--gold));
-    }
-    .leader-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(255,215,0,0.04), transparent 70%);
-      pointer-events: none;
-    }
-    .leader-card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(255,215,0,0.5);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(255,215,0,0.1);
-    }
-
-    .leader-card.ketua::before { background: linear-gradient(90deg, var(--gold-dark), var(--gold-light), var(--gold-dark)); }
-
-    .leader-avatar {
-      width: 100px; height: 100px;
-      border-radius: 50%;
-      border: 2px solid var(--gold);
-      margin: 0 auto 20px;
-      background: var(--dark3);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 36px;
-      box-shadow: 0 0 20px rgba(255,215,0,0.2);
-      position: relative;
-    }
-
-    .leader-badge {
-      position: absolute;
-      top: 10px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-      color: var(--dark);
-      font-family: 'Orbitron', monospace;
-      font-size: 7px;
-      font-weight: 900;
-      letter-spacing: 2px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      white-space: nowrap;
-      z-index: 10;
-    }
-    .leader-badge.wakil { background: linear-gradient(90deg, #888, #ccc); }
-
-    .leader-role {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 4px;
-      color: var(--red);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .leader-name {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 6px;
-    }
-    .leader-id {
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.35);
-      margin-bottom: 16px;
-    }
-    .leader-rank {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: rgba(255,215,0,0.08);
-      border: 1px solid rgba(255,215,0,0.2);
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      color: var(--gold);
-    }
-
-    /* ══ MEMBERS ══ */
-    .members-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 16px;
-    }
-
-    .member-card {
-      background: var(--dark2);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 4px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      transition: all 0.25s ease;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .member-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: linear-gradient(180deg, var(--red), var(--gold));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    .member-card:hover {
-      border-color: rgba(255,215,0,0.2);
-      background: var(--dark3);
-      transform: translateX(4px);
-    }
-    .member-card:hover::before { opacity: 1; }
-
-    .member-num {
-      font-family: 'Orbitron', monospace;
-      font-size: 0.7rem;
-      color: rgba(255,215,0,0.3);
-      min-width: 24px;
-    }
-
-    .member-avatar-sm {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--dark3), #1a1a2e);
-      border: 1px solid rgba(255,215,0,0.2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .member-info { flex: 1; min-width: 0; }
-    .member-name {
-      font-family: 'Rajdhani', sans-serif;
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--white);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .member-pos {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.35);
-      letter-spacing: 1px;
-    }
-
-    .member-status {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #2ecc71;
-      box-shadow: 0 0 6px #2ecc71;
-      flex-shrink: 0;
-    }
-    .member-status.idle { background: var(--gold); box-shadow: 0 0 6px var(--gold); }
-
-    /* ══ ABOUT SECTION ══ */
-    .about-section {
-      background: var(--dark2);
-      border: 1px solid rgba(255,215,0,0.1);
-      border-radius: 4px;
-      padding: 60px 40px;
-      position: relative;
-      overflow: hidden;
-    }
-    .about-section::before {
-      content: 'SYZEN';
-      position: absolute;
-      right: -20px; bottom: -40px;
-      font-family: 'Orbitron', monospace;
-      font-size: 12rem;
-      font-weight: 900;
-      color: rgba(255,215,0,0.025);
-      pointer-events: none;
-      line-height: 1;
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-
-    .about-text h3 {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.5rem;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-    .about-text p {
-      color: rgba(255,255,255,0.6);
-      line-height: 1.8;
-      font-size: 1rem;
-      margin-bottom: 14px;
-    }
-
-    .about-values { display: flex; flex-direction: column; gap: 16px; }
-    .value-item {
-      display: flex; align-items: flex-start; gap: 16px;
-      padding: 16px;
-      background: rgba(255,215,0,0.03);
-      border: 1px solid rgba(255,215,0,0.08);
-      border-radius: 4px;
-      transition: border-color 0.3s;
-    }
-    .value-item:hover { border-color: rgba(255,215,0,0.25); }
-    .value-icon { font-size: 24px; flex-shrink: 0; }
-    .value-title {
-      font-family: 'Orbitron', monospace;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 4px;
-    }
-    .value-desc { font-size: 0.85rem; color: rgba(255,255,255,0.45); line-height: 1.6; }
-
-    /* ══ FOOTER ══ */
-    footer {
-      border-top: 1px solid rgba(255,215,0,0.1);
-      padding: 40px 20px;
-      text-align: center;
-    }
-    .footer-logo {
-      font-family: 'Orbitron', monospace;
-      font-size: 1.4rem;
-      font-weight: 900;
-      background: linear-gradient(90deg, var(--gold-dark), var(--gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-    }
-    .footer-sub {
-      font-size: 0.75rem;
-      letter-spacing: 4px;
-      color: rgba(255,255,255,0.2);
-      text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-    .footer-copy {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.15);
-    }
-
-    /* ══ NAV ══ */
-    nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 16px 40px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: linear-gradient(180deg, rgba(5,5,8,0.95) 0%, rgba(5,5,8,0.6) 70%, transparent 100%);
-}
-    .nav-brand {
-      font-family: 'Orbitron', monospace;
-      font-size: 1rem;
-      font-weight: 900;
-      color: var(--gold);
-      letter-spacing: 2px;
-    }
-    .nav-links {
-      display: flex; gap: 30px; list-style: none;
-    }
-    .nav-links a {
-      color: rgba(255,255,255,0.5);
-      text-decoration: none;
-      font-size: 0.8rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--gold); }
-
-    .nav-badge {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,45,45,0.15);
-      border: 1px solid rgba(255,45,45,0.3);
-      padding: 6px 14px; border-radius: 20px;
-    }
-    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: blink 1.2s ease-in-out infinite; }
-    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
-    .live-text { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--red); }
-
-    /* ══ INFO PANEL (baru) ══ */
-    .info-panel {
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      width: 280px;
-      background: var(--dark2);
-      border: 1px solid var(--gold);
-      border-radius: 8px;
-      padding: 15px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.7);
-      z-index: 200;
-      color: var(--white);
-      font-family: 'Rajdhani', sans-serif;
-      display: none;
-      backdrop-filter: blur(4px);
-    }
-    .info-panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid rgba(255,215,0,0.3);
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-      font-family: 'Orbitron', monospace;
-      color: var(--gold);
-    }
-    .close-btn {
-      background: none;
-      border: none;
-      color: var(--gold);
-      font-size: 24px;
-      cursor: pointer;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-    .close-btn:hover {
-      color: var(--red);
-    }
-    .info-panel-content p {
-      margin: 8px 0;
-      font-size: 14px;
-    }
-    .info-panel-content strong {
-      color: var(--gold-light);
-      width: 70px;
-      display: inline-block;
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 14px 20px; }
-      .nav-links { display: none; }
-      .about-grid { grid-template-columns: 1fr; gap: 30px; }
-      .about-section { padding: 40px 24px; }
-      .ring1,.ring2,.ring3 { display: none; }
-      .info-panel { width: 240px; top: 70px; right: 10px; }
-    }
-
-    /* ══ FADE IN ON SCROLL ══ */
-    .reveal {
-      opacity: 0; transform: translateY(24px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    
-    /* ── SIDEBAR NAV ── */
-
-  .sidebar-nav {
-  position: fixed !important;
-  bottom: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  top: auto !important;
-  transform: none !important;
-  z-index: 102;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 0;
-  padding: 0;
-  background: rgba(5,5,8,0.95);
-  border-top: 1px solid rgba(255,215,0,0.2);
-}
-
-.sidebar-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
-  width: 25%;
-  padding: 10px 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  gap: 4px;
-  transition: background 0.2s;
-}
-
-.sidebar-link:active {
-  background: rgba(255,215,0,0.08);
-}
-
-.sidebar-icon {
-  font-size: 1.3rem;
-  line-height: 1;
-}
-
-.sidebar-label {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  color: rgba(255,215,0,0.6);
-  text-transform: uppercase;
-  opacity: 1;
-  margin-left: 0;
-  pointer-events: none;
-}
-
-.sidebar-link.open .sidebar-label,
-.sidebar-link.open {
-  color: var(--gold);
-}
-
-.sidebar-link.open .sidebar-label {
-  color: var(--gold);
-  opacity: 1;
-}
-
-@media (min-width: 769px) {
-  .sidebar-nav { display: none; }
-}
-    
-    .btn-daftar {
-  position: fixed;
-  top: 60px;
-  right: 20px;
-  z-index: 101;
-  padding: 8px 20px;
-  background: #FFD700;
-  color: #0a0800;
-  font-family: 'Orbitron', monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 0 14px rgba(255,215,0,0.5);
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.btn-daftar:hover {
-  box-shadow: 0 0 24px rgba(255,215,0,0.8);
-  transform: translateY(-1px);
-}
-
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
-  z-index: 999;
-  align-items: center;
-  justify-content: center;
-}
-.modal-overlay.active { display: flex; }
-
-.modal-box {
-  background: #0D0D14;
-  border: 1px solid rgba(255,215,0,0.4);
-  border-radius: 8px;
-  padding: 36px 32px;
-  max-width: 380px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 0 40px rgba(255,215,0,0.15);
-}
-.modal-box p {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 1rem;
-  color: rgba(255,255,255,0.75);
-  line-height: 1.7;
-  margin-bottom: 24px;
-  letter-spacing: 0.5px;
-}
-.modal-btns { display: flex; gap: 12px; justify-content: center; }
-
-.modal-btns .btn-tidak {
-  padding: 10px 28px;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.5);
-  border-radius: 4px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-}
-.modal-btns .btn-tidak:hover {
-  border-color: rgba(255,255,255,0.5);
-  color: #fff;
-}
-.modal-btns .btn-iya {
-  padding: 10px 28px;
-  background: #FFD700;
-  border: none;
-  color: #0a0800;
-  border-radius: 4px;
-  font-family: 'Orbitron', monospace;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  cursor: pointer;
-  box-shadow: 0 0 14px rgba(255,215,0,0.4);
-  transition: box-shadow 0.2s;
-}
-.modal-btns .btn-iya:hover { box-shadow: 0 0 24px rgba(255,215,0,0.7); }
-
-.btn-event {
-  position: fixed;
-  top: 60px;
-  left: 20px;
-  z-index: 101;
-  padding: 8px 20px;
-  background: linear-gradient(135deg, #00C8FF, #0066FF);
-  color: #fff;
-  font-family: 'Orbitron', monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  box-shadow: 0 0 14px rgba(0,150,255,0.5);
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.btn-event:hover {
-  box-shadow: 0 0 24px rgba(0,150,255,0.8);
-  transform: translateY(-1px);
-}
-
-.modal-event-box {
-  background: #0D0D14;
-  border: 1px solid rgba(0,200,255,0.4);
-  border-radius: 8px;
-  padding: 36px 32px;
-  max-width: 420px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 0 40px rgba(0,150,255,0.15);
-}
-.modal-event-box h3 {
-  font-family: 'Orbitron', monospace;
-  font-size: 1rem;
-  color: #00C8FF;
-  letter-spacing: 3px;
-  margin-bottom: 20px;
-}
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
-  text-align: left;
-}
-.event-item {
-  background: rgba(0,200,255,0.05);
-  border: 1px solid rgba(0,200,255,0.2);
-  border-radius: 6px;
-  padding: 14px 16px;
-}
-.event-item .event-nama {
-  font-family: 'Orbitron', monospace;
-  font-size: 0.8rem;
-  color: #00C8FF;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-.event-item .event-tanggal {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-}
-.event-item .event-desc {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.6);
-  line-height: 1.6;
-}
-.btn-tutup-event {
-  padding: 10px 28px;
-  background: transparent;
-  border: 1px solid rgba(0,200,255,0.3);
-  color: #00C8FF;
-  border-radius: 4px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.btn-tutup-event:hover {
-  border-color: #00C8FF;
-  box-shadow: 0 0 12px rgba(0,200,255,0.3);
-}
-
-/* TOMBOL FLOATING BAWAH - BERSERANGAN */
-.floating-buttons {
-  position: fixed;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 999;
-  pointer-events: none; /* biar container ga menghalangi klik */
-}
-
-.floating-btn {
-  pointer-events: auto; /* tombol tetap bisa diklik */
-  padding: 12px 24px;
-  border: none;
-  border-radius: 40px;
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
-}
-
-.daftar-btn {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #0a0800;
-  border: 1px solid rgba(255,215,0,0.6);
-}
-
-/* 1. Mengubah Tombol Event (Floating) */
-.event-btn {
-  background: linear-gradient(135deg, var(--gold), var(--gold-dark)) !important;
-  color: var(--dark) !important; /* Teks jadi gelap agar kontras */
-  border: 1px solid rgba(255, 215, 0, 0.6) !important;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3) !important;
-}
-
-.event-btn:hover {
-  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5) !important;
-}
-
-/* 2. Mengubah Box Pop-up (Modal) Event */
-.modal-event-box {
-  border: 1px solid var(--gold) !important;
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.15) !important;
-}
-
-.modal-event-box h3 {
-  color: var(--gold) !important;
-  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
-}
-
-/* 3. Mengubah Item List di Dalam Event */
-.event-item {
-  background: rgba(255, 215, 0, 0.05) !important;
-  border: 1px solid rgba(255, 215, 0, 0.2) !important;
-}
-
-.event-item .event-nama {
-  color: var(--gold-light) !important;
-}
-
-/* 4. Mengubah Tombol Tutup di Pop-up */
-.btn-tutup-event {
-  border: 1px solid var(--gold) !important;
-  color: var(--gold) !important;
-}
-
-.btn-tutup-event:hover {
-  background: rgba(255, 215, 0, 0.1) !important;
-  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3) !important;
-}
-
-
-/* TOMBOL FLOATING BAWAH - BERSERANGAN */
-.floating-buttons {
-  position: fixed;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 999;
-  pointer-events: none; /* biar container ga menghalangi klik */
-  
-  /* Animasi hilang/muncul */
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-/* Saat muncul (visible) */
-.floating-buttons.visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto; /* KALAU MUNCUL, BISA DIKLIK */
-}
-
-/* Saat hilang (gak punya class visible) */
-.floating-buttons:not(.visible) {
-  opacity: 0;
-  transform: translateY(30px);
-  pointer-events: none; /* ❗ HILANG → TIDAK BISA DIKLIK ❗ */
-}
-
-.floating-btn {
-  pointer-events: auto; /* Ini tetap, tapi tetap terpengaruh parent */
-  padding: 12px 24px;
-  border: none;
-  border-radius: 40px;
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 0.85rem;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
-}
-
-.daftar-btn {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #0a0800;
-  border: 1px solid rgba(255,215,0,0.6);
-}
-
-.event-btn {
-  background: linear-gradient(135deg, #00C8FF, #0066FF);
-  color: white;
-  border: 1px solid rgba(0,200,255,0.6);
-}
-
-.floating-btn:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.05);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-}
-
-/* Responsif HP */
-@media (max-width: 768px) {
-  .floating-btn {
-    padding: 10px 20px;
-    font-size: 0.75rem;
-  }
-  .floating-buttons {
-    bottom: 16px;
-    padding: 0 16px;
-  }
-}
-
-/* Sembunyikan tombol daftar/event lama (kalau masih ada) */
-.btn-daftar, .btn-event, .sidebar-nav {
-  display: none !important;
-}
-
-  </style>
+/* Kunci scroll halaman saat modal terbuka; isi modal tetap bisa di-scroll sendiri */
+html.scroll-lock,html.scroll-lock body{overflow:hidden}
+.modal-patch-box,.modal-box,.modal-event-box{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+</style>
 </head>
 <body>
 
-<!-- PARTICLES -->
 <div class="particles" id="particles"></div>
 
-<!-- NAV -->
 <nav>
-  <div>
-  <div class="nav-brand">SYZEN ID</div>
+  <div class="nav-left">
+    <div class="nav-brand">SYZEN ID</div>
+    <button class="nav-info" id="btnInfo" aria-label="Patch Notes" title="Patch Notes">ℹ️</button>
   </div>
   <ul class="nav-links">
     <li><a href="#home">Home</a></li>
     <li><a href="#leaders">Leader</a></li>
     <li><a href="#members">Anggota</a></li>
+    <li><a href="#bestplayer">Best Player</a></li>
     <li><a href="#about">Tentang</a></li>
   </ul>
-  <div class="nav-badge">
-    <span class="live-dot"></span>
-    <span class="live-text">Active</span>
+  <div class="nav-right">
+    <div class="nav-tools">
+    <div class="gfx" role="group" aria-label="Kualitas grafik">
+      <button type="button" data-gfx="low" title="Grafik Low">Low</button>
+      <button type="button" data-gfx="medium" title="Grafik Medium">Med</button>
+      <button type="button" data-gfx="high" title="Grafik High">High</button>
+    </div>
+    </div>
+    <div class="nav-badge"><span class="live-dot"></span><span class="live-text">Active</span></div>
   </div>
 </nav>
-  <!-- SIDEBAR NAV (HP) -->
-<nav class="sidebar-nav">
-  <a class="sidebar-link" href="#home">
-    <span class="sidebar-icon">🏠</span>
-    <span class="sidebar-label">Beranda</span>
-  </a>
-  <a class="sidebar-link" href="#leaders">
-    <span class="sidebar-icon">👑</span>
-    <span class="sidebar-label">Leaders</span>
-  </a>
-  <a class="sidebar-link" href="#members">
-    <span class="sidebar-icon">🛡️</span>
-    <span class="sidebar-label">Anggota</span>
-  </a>
-  <a class="sidebar-link" href="#about">
-    <span class="sidebar-icon">⚔️</span>
-    <span class="sidebar-label">Tentang</span>
-  </a>
-</nav>
-<!-- INFO PANEL (baru) -->
-<div id="info-panel" class="info-panel">
-  <div class="info-panel-header">
-    <span>Detail Anggota</span>
-    <button class="close-btn" id="close-panel">&times;</button>
-  </div>
-  <div class="info-panel-content">
-    <p><strong>Nama:</strong> <span id="info-name"></span></p>
-    <p><strong>Role:</strong> <span id="info-role"></span></p>
-    <p><strong>Rank:</strong> <span id="info-rank"></span></p>
-    <p><strong>ID:</strong> <span id="info-id"></span></p>
+
+<!-- ══ MODAL DETAIL PEMAIN (diisi lewat JS dari .member-card) ══ -->
+<div class="pm-overlay" id="pmOverlay" aria-hidden="true">
+  <div class="pm" role="dialog" aria-modal="true" aria-labelledby="pmName">
+    <img class="pm-img" id="pmImg" alt="" />
+    <div class="pm-fade"></div>
+    <div class="pm-awards" id="pmAwards"></div>
+    <button class="pm-close" id="pmClose" aria-label="Tutup">&times;</button>
+    <div class="pm-body">
+      <div class="pm-name" id="pmName"></div>
+      <div class="pm-role" id="pmRole"></div>
+      <div class="pm-stats">
+        <div class="pm-stat"><span>Role</span><b id="pmStatRole"></b></div>
+        <div class="pm-stat"><span>Rank</span><b id="pmRank"></b></div>
+        <div class="pm-stat"><span>ID MLBB</span><b id="pmId"></b></div>
+        <div class="pm-stat"><span>Hero Favorit</span><b id="pmFav"></b></div>
+      </div>
+    </div>
   </div>
 </div>
 
 <div class="wrapper">
-<!-- TOMBOL FLOATING BAWAH (BERSERANGAN KIRI-KANAN) -->
+
 <div class="floating-buttons">
-  <button class="floating-btn daftar-btn" onclick="bukaModal()">
-    🖊 Daftar
-  </button>
-  <button class="floating-btn event-btn" onclick="bukaEvent()">
-    📅 Event
-  </button>
-</div>
-  <!-- ══ HERO ══ -->
-  <header id="home">
-    <div class="hero-bg-ring ring1"></div>
-    <div class="hero-bg-ring ring2"></div>
-    <div class="hero-bg-ring ring3"></div>
-    <div class="corner corner-tl"></div>
-    <div class="corner corner-tr"></div>
-    <div class="corner corner-bl"></div>
-    <div class="corner corner-br"></div>
-
-    <!-- LOGO -->
-    <div class="logo-container syzen-logo" style="margin: 0 auto 30px;">
-  <img src="SYZENID.png" alt="SYZEN ID Logo">
+  <button class="floating-btn daftar-btn" onclick="bukaModal()">🖊 Daftar</button>
+  <button class="floating-btn event-btn" onclick="bukaEvent()">📅 Event</button>
 </div>
 
-<span class="tag-line">Mobile Legends • Indonesia</span>
-<h1>SYZEN ID</h1>
+<!-- ══ HERO ══ -->
+<header id="home">
+  <div class="hero-bg-ring ring1"></div><div class="hero-bg-ring ring2"></div><div class="hero-bg-ring ring3"></div>
+  <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
 
-    <div class="hero-divider">
-      <span></span>
-      <i>⚔</i>
-      <span></span>
-    </div>
+  <!-- ⬇ LOGO: simpan logo perisai baru sebagai SYZENID.png (PNG transparan paling bagus) -->
+  <div class="logo-container"><img src="SYZEN-LOGO-2.0.jpg" alt="Logo SYZEN ID"></div>
 
-    <div class="hero-stats">
-      <div class="stat">
-        <span class="stat-num" id="counter-member">0</span>
-        <span class="stat-label">Anggota</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num" id="counter-win">0</span>
-        <span class="stat-label">Winrate</span>
-      </div>
-      <div class="stat">
-        <span class="stat-num" id="counter-season">0</span>
-        <span class="stat-label">Season</span>
-      </div>
-    </div>
+  <span class="tag-line">Mobile Legends • Indonesia</span>
+  <h1>SYZEN ID</h1>
+  <div class="hero-divider"><span></span><i>⚔</i><span></span></div>
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num" id="counter-member">0</span><span class="stat-label">Anggota</span></div>
+    <div class="stat"><span class="stat-num" id="counter-win">0</span><span class="stat-label">Winrate</span></div>
+    <div class="stat"><span class="stat-num" id="counter-season">0</span><span class="stat-label">Season</span></div>
+  </div>
+  <div class="scroll-hint"><span>Scroll</span><div class="scroll-arrow"></div></div>
+</header>
 
-    <div class="scroll-hint">
-      <span>Scroll</span>
-      <div class="scroll-arrow"></div>
-    </div>
-  </header>
+<!-- ══ LEADERS (tanpa pop-up) ══ -->
+<section id="leaders">
+  <div class="section-header reveal">
+    <span class="section-tag">// Pimpinan Squad</span>
+    <h2 class="section-title">LEADERSHIP</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="leaders-grid">
 
-  <!-- ══ LEADERS ══ -->
-  <section id="leaders">
-    <div class="section-header reveal">
-      <span class="section-tag">// Pimpinan Squad</span>
-      <h2 class="section-title">LEADERSHIP</h2>
-      <div class="section-line"></div>
-    </div>
-
-    <div class="leaders-grid">
-
-      <!-- KETUA -->
-      <div class="leader-card ketua reveal">
+    <div class="leader-card ketua reveal">
+      <!-- ⬇ FOTO SKIN KETUA: ganti src (rasio kotak 1:1) -->
+      <div class="leader-photo">
+        <span class="ph">👑</span>
+        <img src="skin/ketua-reza.jpg" alt="Skin hero Reza" onerror="this.remove()">
         <div class="leader-badge">⭐ Ketua</div>
-        <div class="leader-avatar">👑</div>
+      </div>
+      <div class="leader-body">
         <div class="leader-role">Ketua Squad</div>
         <div class="leader-name">Reza</div>
         <div class="leader-id">ID: Secret</div>
-        <div> <class="leader-role-detail">All Role
-        </div>
+        <div class="leader-role-detail">All Role</div>
         <div class="leader-rank">🏆 Mythical Glory</div>
       </div>
+    </div>
 
-      <!-- WAKIL KETUA -->
-      <div class="leader-card reveal">
+    <div class="leader-card reveal">
+      <!-- ⬇ FOTO SKIN WAKIL KETUA: ganti src (rasio kotak 1:1) -->
+      <div class="leader-photo">
+        <span class="ph">🎖️</span>
+        <img src="skin/wakil-farid.jpg" alt="Skin hero Farid" onerror="this.remove()">
         <div class="leader-badge wakil">🥈 Wakil Ketua</div>
-        <div class="leader-avatar">🎖️</div>
+      </div>
+      <div class="leader-body">
         <div class="leader-role">Wakil Ketua</div>
         <div class="leader-name">Farid</div>
         <div class="leader-id">ID: 170696384</div>
-        <div> <class="leader-role-detail">Jungler/Exp Lane</class></div>
+        <div class="leader-role-detail">Jungler/Exp Lane</div>
         <div class="leader-rank">⚡ Mythical Glory</div>
       </div>
-
-    </div>
-  </section>
-
-  <!-- ══ MEMBERS ══ (dengan atribut data) -->
-  <section id="members">
-    <div class="section-header reveal">
-      <span class="section-tag">// Daftar Anggota</span>
-      <h2 class="section-title">ROSTER SQUAD</h2>
-      <div class="section-line"></div>
     </div>
 
-    <div class="members-grid" id="membersGrid">
+  </div>
+</section>
 
-      <!-- 1. Dayat -->
-      <div class="member-card reveal" data-name="Dayat" data-role="Exp Lane/Roamer" data-rank="Mythic Honor" data-id="Secret">
-        <span class="member-num">01</span>
-        <div class="member-avatar-sm">️🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Dayat</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+<!-- ══ ROSTER ══
+  Tiap kartu: data-fav = hero favorit, data-img = path foto skin (rasio 4:3).
+  Foto simpan di folder skin/ atau ganti path-nya. -->
+<section id="members">
+  <div class="section-header reveal">
+    <span class="section-tag">// Daftar Anggota</span>
+    <h2 class="section-title">ROSTER SQUAD</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="members-grid" id="membersGrid">
 
-      <!-- 2. Fauzan -->
-      <div class="member-card reveal" data-name="Fauzan" data-role="Gold Lane/Mid lane" data-rank="Mythic Glory" data-id="304208540">
-        <span class="member-num">02</span>
-        <div class="member-avatar-sm">️🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Fauzan</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Dayat" data-role="Exp Lane/Roamer" data-rank="Mythic Honor" data-id="Secret" data-fav="Chou" data-img="Chou-Saint-Sea.jpg"><span class="member-num">01</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Dayat</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
 
-      <!-- 3. Febian -->
-      <div class="member-card reveal" data-name="Febian" data-role="Roamer/Mid lane" data-rank="Mythic Glory" data-id="228803187">
-        <span class="member-num">03</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Febian</div>
-          <div class="member-pos">Web Developer/Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Fauzan" data-role="Gold Lane/Mid lane" data-rank="Mythic Glory" data-id="304208540" data-fav="-" data-img="skin/fauzan.jpg"><span class="member-num">02</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Fauzan</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
 
-      <!-- 4. Alvin -->
-      <div class="member-card reveal" data-name="Alvin" data-role="All Role" data-rank="Mythic Glory" data-id="Secret">
-        <span class="member-num">04</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Alvin</div>
-          <div class="member-pos">Coach/Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Febian" data-role="Roamer/Mid lane" data-rank="Mythic Glory" data-id="228803187" data-fav="Ruby" data-img="Ruby-Aspirant.jpeg"><span class="member-num">03</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Febian</div><div class="member-pos">Web Developer/Anggota</div></div><div class="member-status"></div></div>
 
-      <!-- 5. Sebio -->
-      <div class="member-card reveal" data-name="Sebio" data-role="Exp Lane" data-rank="Mythic" data-id="Secret">
-        <span class="member-num">05</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Sebio</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Sebio" data-role="Exp Lane" data-rank="Mythic" data-id="Secret" data-fav="Benedeta" data-img="Benedetta-Soul-Vessel.png"><span class="member-num">04</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Sebio</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
 
-      <!-- 6. Redit -->
-      <div class="member-card reveal" data-name="Redit" data-role="Gold lane" data-rank="Mythic" data-id="Secret">
-        <span class="member-num">06</span>
-        <div class="member-avatar-sm">️🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Redit</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Azkia" data-role="Roamer/EXP" data-rank="Mythic Glory" data-id="Secret" data-fav="Tigreal" data-img="Tigreal-Lightborn.png"><span class="member-num">05</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Azkia</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
 
-      <!-- 7. Marvel -->
-      <div class="member-card reveal" data-name="Marvel" data-role="Gold Lane" data-rank="Mythic" data-id="Secret">
-        <span class="member-num">07</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Marvel</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Aeronn" data-role="All Role" data-rank="Mythic Immortal" data-id="Secret" data-fav="-" data-img="skin/aeronn.jpg"><span class="member-num">06</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Aeronn</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
 
-            <!-- 8. Azkia -->
-      <div class="member-card reveal" data-name="Azkia" data-role="Roamer/EXP" data-rank="Mythic Glory" data-id="Secret">
-        <span class="member-num">08</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Azkia</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Ferry" data-role="Roamer/Gold Lane/EXP" data-rank="Mythic Glory" data-id="Secret" data-fav="Yi Sun-Shin" data-img="Yi Sun-Shin-Collector.jpeg"><span class="member-num">07</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Ferry</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
 
-            <!-- 9. Aeron -->
-      <div class="member-card reveal" data-name="Aeronn" data-role="All Role" data-rank="Mythic Immortal" data-id="Secret">
-        <span class="member-num">09</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Aeronn</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
+    <div class="member-card reveal" data-name="Raffa" data-role="Mid lane" data-rank="Mythic Honor" data-id="1621296996" data-fav="Vale, Novaria" data-img="skin/raffa.jpg"><span class="member-num">08</span><div class="member-avatar-sm">🇮🇩</div><div class="member-info"><div class="member-name">Raffa</div><div class="member-pos">Anggota</div></div><div class="member-status"></div></div>
+    
+  </div>
+</section>
 
-            <!-- 10. Ferry -->
-      <div class="member-card reveal" data-name="Ferry" data-role="Roamer/Gold Lane/EXP" data-rank="Mythic Glory" data-id="Secret">
-        <span class="member-num">10</span>
-        <div class="member-avatar-sm">🇮🇩</div>
-        <div class="member-info">
-          <div class="member-name">Ferry</div>
-          <div class="member-pos">Anggota</div>
-        </div>
-        <div class="member-status"></div>
-      </div>
-
+<!-- ══ BEST PLAYER (Hall of Fame) ══
+  Isi NAMA di tiap .bp-name persis seperti data-name di Roster (mis. Fauzan).
+  Hero favorit + foto skin + aura roster terisi otomatis oleh JS. -->
+<section id="bestplayer">
+  <div class="section-header reveal">
+    <span class="section-tag">// Hall of Fame</span>
+    <h2 class="section-title">BEST PLAYER</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="bp-grid">
+    <div class="bp-card year reveal" data-tier="year">
+      <div class="bp-photo"><img alt="" /></div>
+      <span class="bp-icon">🏆</span>
+      <span class="bp-badge">BEST PLAYER THIS YEAR</span>
+      <div class="bp-name">???</div>
+      <span class="bp-hero-label">Hero Favorit</span><div class="bp-hero">-</div>
     </div>
-  </section>
-
-  <!-- ══ ABOUT ══ -->
-  <section id="about" style="padding-bottom: 100px;">
-    <div class="section-header reveal">
-      <span class="section-tag">// Tentang Kami</span>
-      <h2 class="section-title">TENTANG SYZEN ID</h2>
-      <div class="section-line"></div>
+    <div class="bp-card month reveal" data-tier="month">
+      <div class="bp-photo"><img alt="" /></div>
+      <span class="bp-icon">🥈</span>
+      <span class="bp-badge">BEST PLAYER THIS MONTH</span>
+      <div class="bp-name">???</div>
+      <span class="bp-hero-label">Hero Favorit</span><div class="bp-hero">-</div>
     </div>
+    <div class="bp-card week reveal" data-tier="week">
+      <div class="bp-photo"><img alt="" /></div>
+      <span class="bp-icon">🥉</span>
+      <span class="bp-badge">BEST PLAYER THIS WEEK</span>
+      <div class="bp-name">???</div>
+      <span class="bp-hero-label">Hero Favorit</span><div class="bp-hero">-</div>
+    </div>
+  </div>
+</section>
 
-    <div class="about-section reveal">
-      <div class="about-grid">
-        <div class="about-text">
-          <h3>Kami Adalah SYZEN ID</h3>
-          <p>
-            SYZEN ID adalah squad Mobile Legends asal Indonesia yang terbentuk dari semangat bermain, kerja sama tim, dan keinginan untuk terus berkembang di dunia gaming kompetitif.
-          </p>
-          <p>
-            Kami menjunjung tinggi sportivitas, disiplin, dan loyalitas antar sesama anggota. Bersama kami tidak hanya bermain — kami bertarung, kami berkembang, dan kami menang.
-          </p>
-          <p style="color: rgba(255,215,0,0.6); font-family: 'Orbitron', monospace; font-size: 0.9rem; letter-spacing: 2px;">
-            "ONE SQUAD. ONE MISSION. VICTORY."
-          </p>
-        </div>
+<!-- ══ REKOMENDASI TOP UP (ganti toko & link di array TOPUP_STORES, bagian JS paling bawah) ══ -->
+<section id="topup">
+  <div class="topup-box reveal">
+    <span class="topup-label">⚡ REKOMENDASI TOP UP:</span>
+    <a class="topup-link" id="topupLink" href="#" target="_blank" rel="noopener noreferrer">
+      <span class="ticker"><span id="tkA" class="cur"></span><span id="tkB" class="below"></span></span>
+    </a>
+  </div>
+</section>
 
-        <div class="about-values">
-          <div class="value-item">
-            <div class="value-icon">⚔️</div>
-            <div>
-              <div class="value-title">Kompetitif</div>
-              <div class="value-desc">Selalu memberikan performa terbaik di setiap pertandingan, dari ranked hingga turnamen.</div>
-            </div>
-          </div>
-          <div class="value-item">
-            <div class="value-icon">🛡️</div>
-            <div>
-              <div class="value-title">Solid</div>
-              <div class="value-desc">Kekuatan squad terletak pada kekompakan dan kepercayaan antar anggota tim.</div>
-            </div>
-          </div>
-          <div class="value-item">
-            <div class="value-icon">🌟</div>
-            <div>
-              <div class="value-title">Berkembang</div>
-              <div class="value-desc">Terus belajar, berlatih, dan meningkatkan skill demi membawa nama SYZEN ID lebih tinggi.</div>
-            </div>
-          </div>
-        </div>
+<!-- ══ ABOUT ══ -->
+<section id="about" style="padding-bottom:100px">
+  <div class="section-header reveal">
+    <span class="section-tag">// Tentang Kami</span>
+    <h2 class="section-title">TENTANG SYZEN ID</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="about-section reveal">
+    <div class="about-grid">
+      <div class="about-text">
+        <h3>Kami Adalah SYZEN ID</h3>
+        <p>SYZEN ID adalah squad Mobile Legends asal Indonesia yang terbentuk dari semangat bermain, kerja sama tim, dan keinginan untuk terus berkembang di dunia gaming kompetitif.</p>
+        <p>Kami menjunjung tinggi sportivitas, disiplin, dan loyalitas antar sesama anggota. Bersama kami tidak hanya bermain — kami bertarung, kami berkembang, dan kami menang.</p>
+        <p style="color:var(--gold);font-family:'Orbitron',monospace;font-size:.9rem;letter-spacing:2px">"ONE SQUAD. ONE MISSION. VICTORY."</p>
+      </div>
+      <div class="about-values">
+        <div class="value-item"><div class="value-icon">⚔️</div><div><div class="value-title">Kompetitif</div><div class="value-desc">Selalu memberikan performa terbaik di setiap pertandingan, dari ranked hingga turnamen.</div></div></div>
+        <div class="value-item"><div class="value-icon">🛡️</div><div><div class="value-title">Solid</div><div class="value-desc">Kekuatan squad terletak pada kekompakan dan kepercayaan antar anggota tim.</div></div></div>
+        <div class="value-item"><div class="value-icon">🌟</div><div><div class="value-title">Berkembang</div><div class="value-desc">Terus belajar, berlatih, dan meningkatkan skill demi membawa nama SYZEN ID lebih tinggi.</div></div></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
 </div><!-- end .wrapper -->
 
-<!-- FOOTER -->
 <footer>
   <div class="footer-logo">SYZEN ID</div>
   <div class="footer-sub">Mobile Legends Squad • Indonesia</div>
   <div class="footer-copy">© 2025 - 2026 SYZEN ID. All rights reserved.</div>
 </footer>
- <!-- Modal Daftar -->
+
+<!-- Modal Daftar -->
 <div class="modal-overlay" id="modalDaftar">
   <div class="modal-box">
-    <p>Anda ingin nama anda masuk di guild ini?<br>Klik Tombol <strong style="color:#FFD700">Iya</strong> dan mulai daftar!</p>
+    <p>Anda ingin nama anda masuk di guild ini?<br>Klik Tombol <strong style="color:var(--gold)">Iya</strong> dan mulai daftar!</p>
     <div class="modal-btns">
       <button class="btn-tidak" onclick="tutupModal()">Tidak</button>
       <button class="btn-iya" onclick="pergiDaftar()">Iya</button>
@@ -1473,178 +552,289 @@
   <div class="modal-event-box">
     <h3>📅 EVENT SYZEN ID</h3>
     <div class="event-list">
-
-    
-
       <div class="event-item">
-        <div class="event-nama">Coming Soon...</div>
-        <div class="event-tanggal">📅 ?, ?? ? ????</div>
-        <div class="event-desc">Coming Soon...</div>
+        <div class="event-nama">Revamp Update!</div>
+        <div class="event-tanggal">📅 Selasa, 20, 10, 2026</div>
+        <div class="event-desc">Revamp Update is Coming Out, We have so many feature for use!</div>
       </div>
-
     </div>
     <button class="btn-tutup-event" onclick="tutupEvent()">Tutup</button>
   </div>
 </div>
-<!-- MAINTENANCE -->
+
+<!-- Modal Peringatan Grafik High -->
+<div class="modal-overlay" id="modalGfx">
+  <div class="modal-box">
+    <h3 class="mb-title">⚠️ MODE HIGH</h3>
+    <p>Mode High mengaktifkan semua efek (blur, partikel, animasi penuh). Di beberapa perangkat ini bisa menyebabkan <strong style="color:var(--gold)">freeze atau lag</strong>. Yakin ingin mengaktifkan?</p>
+    <div class="modal-btns">
+      <button class="btn-tidak" onclick="tutupGfx()">Batal</button>
+      <button class="btn-iya" onclick="aktifkanHigh()">Aktifkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Patch Notes -->
+<div class="modal-overlay" id="modalPatch">
+  <div class="modal-patch-box">
+    <h3 class="mb-title">✨ PATCH NOTES v2.0</h3>
+    <ul class="patch-list">
+      <li><b>Tampilan baru</b> — palet biru &amp; emas mengikuti logo perisai terbaru.</li>
+      <li><b>Hall of Fame</b> — Best Player tahun, bulan, dan minggu ini. Kartu pemenang di Roster menyala sesuai tingkatannya.</li>
+      <li><b>Detail player</b> — klik kartu Roster untuk membuka pop-up besar dengan skin hero dan badge penghargaan.</li>
+      <li><b>Pengaturan grafik</b> — pilih Low, Medium, atau High di navbar sesuai kemampuan HP kamu.</li>
+      <li><b>Rekomendasi top up</b> — daftar toko top up yang berganti otomatis di bawah Hall of Fame.</li>
+    </ul>
+    <p class="patch-hint">Buka lagi kapan saja lewat tombol ℹ️ di navbar.</p>
+    <button class="btn-iya" onclick="tutupPatch()">Mengerti</button>
+  </div>
+</div>
+
+<!-- Maintenance -->
 <div class="maintenance-overlay" id="maintenanceOverlay">
   <div class="maintenance-box">
     <span class="maintenance-icon">🔧</span>
     <h2>UNDER MAINTENANCE</h2>
     <p>Website sedang ditutup atau dalam perbaikan Bug ataupun penambahan Fitur Baru!.<br>
-       <strong style="color:var(--gold)">Anda masuk untuk mendaftar?, Pencet tombol shortcut ini!</strong>
-    </p>
-    <a href="https://rennzaixd.github.io/Pendaftaran-Guild/index.html" target="_blank" class="floating-btn daftar-btn" style="text-decoration: none; display: inline-block;">
-  🖊 Daftar
-</a>
-
+      <strong style="color:var(--gold)">Anda masuk untuk mendaftar?, Pencet tombol shortcut ini!</strong></p>
+    <a href="https://rennzaixd.github.io/Pendaftaran-Guild/index.html" target="_blank" class="floating-btn daftar-btn" style="pointer-events:auto;display:inline-block">🖊 Daftar</a>
   </div>
 </div>
 
 <script>
-  // ── PARTICLES ──
-  const container = document.getElementById('particles');
-  for (let i = 0; i < 40; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.cssText = `
-      left: ${Math.random() * 100}%;
-      width: ${Math.random() > 0.7 ? 3 : 2}px;
-      height: ${Math.random() > 0.7 ? 3 : 2}px;
-      animation-duration: ${6 + Math.random() * 12}s;
-      animation-delay: ${Math.random() * 10}s;
-      --dx: ${(Math.random() - 0.5) * 200}px;
-      opacity: ${Math.random() * 0.8};
-      background: ${Math.random() > 0.7 ? '#FF2D2D' : '#FFD700'};
-    `;
-    container.appendChild(p);
-  }
-
-  // ── SCROLL REVEAL ──
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach((e, i) => {
-      if (e.isIntersecting) {
-        setTimeout(() => e.target.classList.add('visible'), i * 60);
-      }
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-  // ── COUNTER ANIMATION ──
-  function animateCounter(el, target, suffix='') {
-    let count = 0;
-    const step = Math.ceil(target / 60);
-    const timer = setInterval(() => {
-      count = Math.min(count + step, target);
-      el.textContent = count + suffix;
-      if (count >= target) clearInterval(timer);
-    }, 30);
-  }
-
-  const counterObserver = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      animateCounter(document.getElementById('counter-member'), 12);
-      animateCounter(document.getElementById('counter-win'), 62, '%');
-      animateCounter(document.getElementById('counter-season'), 40);
-      counterObserver.disconnect();
-    }
-  });
-  counterObserver.observe(document.getElementById('counter-member'));
-
-  // ── INFO PANEL (baru) ──
-  const panel = document.getElementById('info-panel');
-  const closeBtn = document.getElementById('close-panel');
-  const infoName = document.getElementById('info-name');
-  const infoRole = document.getElementById('info-role');
-  const infoRank = document.getElementById('info-rank');
-  const infoId = document.getElementById('info-id');
-
-  // Tutup panel
-  closeBtn.addEventListener('click', () => {
-    panel.style.display = 'none';
-  });
-
-  // Klik pada member-card (bukan leader)
-  document.querySelectorAll('.member-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      // Ambil data dari atribut
-      const name = card.dataset.name;
-      const role = card.dataset.role;
-      const rank = card.dataset.rank;
-      const id = card.dataset.id;
-
-      // Isi panel
-      infoName.textContent = name;
-      infoRole.textContent = role;
-      infoRank.textContent = rank;
-      infoId.textContent = id;
-
-      // Tampilkan panel
-      panel.style.display = 'block';
-    });
-  });
-
-  // Klik di luar panel untuk menutup (opsional)
-  document.addEventListener('click', (e) => {
-    if (!panel.contains(e.target) && !e.target.closest('.member-card')) {
-      panel.style.display = 'none';
-    }
-  });
-  
-  function bukaModal() {
-  document.getElementById('modalDaftar').classList.add('active');
-}
-function tutupModal() {
-  document.getElementById('modalDaftar').classList.remove('active');
-}
-function pergiDaftar() {
-  window.open('https://rennzaixd.github.io/Pendaftaran-Guild/index.html', '_blank');
-  tutupModal();
-}
-
-function bukaEvent() {
-  document.getElementById('modalEvent').classList.add('active');
-}
-function tutupEvent() {
-  document.getElementById('modalEvent').classList.remove('active');
-}
-
-// Klik di luar modal event = tutup
-document.getElementById('modalEvent').addEventListener('click', function(e) {
-  if(e.target === this) tutupEvent();
-});
-
-// ── BOTTOM NAV ──
-document.querySelectorAll('.sidebar-link').forEach(link => {
-  link.addEventListener('click', function() {
-    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('open'));
-    this.classList.add('open');
-  });
-});
 const MAINTENANCE = false; // ganti true/false aja
 
+// ── PARTICLES (biru neon / emas / putih) — jumlah ikut mode grafik ──
+const pc = document.getElementById('particles');
+const pColors = ['#0075FF','#0075FF','#FFC700','#E6F0FA'];
+function buildParticles() {
+  pc.textContent = '';
+  const m = document.documentElement.dataset.gfx;
+  if (m === 'low') return;
+  const n = m === 'high' ? 60 : 30;
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('div'), s = Math.random() > .7 ? 3 : 2;
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;width:${s}px;height:${s}px;animation-duration:${6+Math.random()*12}s;animation-delay:${Math.random()*10}s;--dx:${(Math.random()-.5)*200}px;background:${pColors[Math.floor(Math.random()*pColors.length)]}`;
+    pc.appendChild(p);
+  }
+}
+
+// ── SCROLL REVEAL ──
+const io = new IntersectionObserver(es => es.forEach((e, i) => {
+  if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 60); io.unobserve(e.target); }
+}), { threshold: .1 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// ── COUNTER ──
+function animateCounter(el, target, suffix = '') {
+  let c = 0; const step = Math.ceil(target / 60);
+  const t = setInterval(() => { c = Math.min(c + step, target); el.textContent = c + suffix; if (c >= target) clearInterval(t); }, 30);
+}
+const co = new IntersectionObserver(es => {
+  if (es[0].isIntersecting) {
+    animateCounter(document.getElementById('counter-member'), 10);
+    animateCounter(document.getElementById('counter-win'), 50, '%');
+    animateCounter(document.getElementById('counter-season'), 42);
+    co.disconnect();
+  }
+});
+co.observe(document.getElementById('counter-member'));
+
+// ── MODAL DETAIL PEMAIN (hanya .member-card / roster) ──
+const pmOverlay = document.getElementById('pmOverlay');
+const pmImg = document.getElementById('pmImg');
+let lastFocus = null;
+
+function openPlayer(card) {
+  const d = card.dataset;
+  document.getElementById('pmName').textContent = d.name || '-';
+  document.getElementById('pmRole').textContent = d.role || '-';
+  document.getElementById('pmStatRole').textContent = d.role || '-';
+  document.getElementById('pmRank').textContent = d.rank || '-';
+  document.getElementById('pmId').textContent = d.id || '-';
+  document.getElementById('pmFav').textContent = d.fav || '-';
+  renderAwards(card);
+  pmImg.style.display = '';
+  pmImg.onerror = () => { pmImg.style.display = 'none'; }; // belum ada foto → tampil background gradient
+  pmImg.src = d.img || '';
+  pmImg.alt = 'Skin hero ' + (d.name || '');
+  if (!d.img) pmImg.style.display = 'none';
+  lastFocus = document.activeElement;
+  pmOverlay.classList.add('active');
+  pmOverlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
+  document.getElementById('pmClose').focus();
+}
+function closePlayer() {
+  pmOverlay.classList.remove('active');
+  pmOverlay.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
+  if (lastFocus) lastFocus.focus();
+}
+document.querySelectorAll('.member-card').forEach(card => {
+  card.tabIndex = 0;
+  card.addEventListener('click', () => openPlayer(card));
+  card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlayer(card); } });
+});
+document.getElementById('pmClose').addEventListener('click', closePlayer);
+pmOverlay.addEventListener('click', e => { if (e.target === pmOverlay) closePlayer(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (pmOverlay.classList.contains('active')) closePlayer();
+  tutupModal(); tutupEvent(); tutupGfx(); tutupPatch();
+});
+
+// ── MODAL DAFTAR & EVENT ──
+function bukaModal()  { document.getElementById('modalDaftar').classList.add('active'); }
+function tutupModal() { document.getElementById('modalDaftar').classList.remove('active'); }
+function pergiDaftar() { window.open('https://rennzaixd.github.io/Pendaftaran-Guild/index.html', '_blank'); tutupModal(); }
+function bukaEvent()  { document.getElementById('modalEvent').classList.add('active'); }
+function tutupEvent() { document.getElementById('modalEvent').classList.remove('active'); }
+document.getElementById('modalEvent').addEventListener('click', e => { if (e.target === e.currentTarget) tutupEvent(); });
+document.getElementById('modalDaftar').addEventListener('click', e => { if (e.target === e.currentTarget) tutupModal(); });
+document.getElementById('modalGfx').addEventListener('click', e => { if (e.target === e.currentTarget) tutupGfx(); });
+document.getElementById('modalPatch').addEventListener('click', e => { if (e.target === e.currentTarget) tutupPatch(); });
+
+// ── MAINTENANCE ──
 if (MAINTENANCE) {
   document.getElementById('maintenanceOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
 }
 
-// Animasi floating buttons: Awal muncul, scroll ke bawah jadi hilang
-const floatingBtns = document.querySelector('.floating-buttons');
+// ── FLOATING BUTTONS: muncul di atas, hilang saat scroll ──
+const fb = document.querySelector('.floating-buttons');
+const toggleFb = () => fb.classList.toggle('visible', window.scrollY <= 100);
+toggleFb();
+window.addEventListener('scroll', toggleFb, { passive: true });
 
-// Set awal: langsung muncul (bisa diklik)
-floatingBtns.classList.add('visible');
+// ══════════ v2.0 ══════════
 
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 100) {
-    // Scroll ke bawah > 100px → tombol hilang (ga bisa diklik)
-    floatingBtns.classList.remove('visible');
-  } else {
-    // Scroll ke atas (posisi atas) → tombol muncul lagi (bisa diklik)
-    floatingBtns.classList.add('visible');
-  }
-});
+// ── HALL OF FAME: sinkron otomatis dengan Roster (cocok lewat nama) ──
+const TIERS = {
+  year:  { label: 'BEST PLAYER THIS YEAR',  order: 0 },
+  month: { label: 'BEST PLAYER THIS MONTH', order: 1 },
+  week:  { label: 'BEST PLAYER THIS WEEK',  order: 2 }
+};
+function syncHallOfFame() {
+  const cards = [...document.querySelectorAll('.member-card')];
+  cards.forEach(c => { c.classList.remove('aura-year', 'aura-month', 'aura-week'); delete c.dataset.awards; });
+  document.querySelectorAll('.bp-card').forEach(bp => {
+    const tier = bp.dataset.tier;
+    const name = bp.querySelector('.bp-name').textContent.trim().toLowerCase();
+    const heroEl = bp.querySelector('.bp-hero');
+    const img = bp.querySelector('.bp-photo img');
+    bp.classList.remove('has-img');
+    img.removeAttribute('src');
+    const m = cards.find(c => (c.dataset.name || '').trim().toLowerCase() === name);
+    if (!m) { heroEl.textContent = '-'; return; }
+    heroEl.textContent = (m.dataset.fav || '').trim() || '-';
+    m.dataset.awards = (m.dataset.awards ? m.dataset.awards + ',' : '') + tier;
+    if (m.dataset.img) {
+      img.onload = () => bp.classList.add('has-img');
+      img.onerror = () => bp.classList.remove('has-img');
+      img.src = m.dataset.img;
+    }
+  });
+  cards.forEach(c => {
+    const a = (c.dataset.awards || '').split(',');
+    const top = ['year', 'month', 'week'].find(t => a.includes(t));
+    if (top) c.classList.add('aura-' + top);
+  });
+}
+function renderAwards(card) {
+  const box = document.getElementById('pmAwards');
+  box.textContent = '';
+  (card.dataset.awards || '').split(',').filter(Boolean)
+    .sort((a, b) => TIERS[a].order - TIERS[b].order)
+    .forEach(t => {
+      const s = document.createElement('span');
+      s.className = 'pm-award ' + t;
+      s.textContent = TIERS[t].label;
+      box.appendChild(s);
+    });
+}
+syncHallOfFame();
 
+// ── GRAFIK: Low / Medium / High (tersimpan di localStorage, default Medium) ──
+const GFX_KEY = 'syzen_gfx';
+function getGfx() {
+  try { const v = localStorage.getItem(GFX_KEY); return ['low', 'medium', 'high'].includes(v) ? v : 'medium'; }
+  catch (e) { return 'medium'; }
+}
+function setGfx(m) {
+  document.documentElement.dataset.gfx = m;
+  try { localStorage.setItem(GFX_KEY, m); } catch (e) {}
+  document.querySelectorAll('.gfx button').forEach(b => {
+    const on = b.dataset.gfx === m;
+    b.classList.toggle('on', on);
+    b.setAttribute('aria-pressed', on);
+  });
+  buildParticles();
+}
+function bukaGfx()  { document.getElementById('modalGfx').classList.add('active'); }
+function tutupGfx() { document.getElementById('modalGfx').classList.remove('active'); }
+function aktifkanHigh() { setGfx('high'); tutupGfx(); }
+document.querySelectorAll('.gfx button').forEach(b => b.addEventListener('click', () => {
+  const m = b.dataset.gfx;
+  if (m === document.documentElement.dataset.gfx) return;
+  if (m === 'high') { bukaGfx(); return; }
+  setGfx(m);
+}));
+setGfx(getGfx());
+
+// ── PATCH NOTES: muncul otomatis sekali per versi ──
+const PATCH_VERSION = '2.0';
+const PATCH_KEY = 'syzen_patch_seen';
+function bukaPatch() { document.getElementById('modalPatch').classList.add('active'); }
+function tutupPatch() {
+  const el = document.getElementById('modalPatch');
+  if (!el.classList.contains('active')) return;
+  el.classList.remove('active');
+  try { localStorage.setItem(PATCH_KEY, PATCH_VERSION); } catch (e) {}
+}
+document.getElementById('btnInfo').addEventListener('click', bukaPatch);
+try {
+  if (!MAINTENANCE && localStorage.getItem(PATCH_KEY) !== PATCH_VERSION) setTimeout(bukaPatch, 700);
+} catch (e) {}
+
+// ── REKOMENDASI TOP UP: ganti nama toko & link di sini ──
+const TOPUP_STORES = [
+  { name: 'PointGo.id', url: 'https://pointgo.id/' },
+  { name: 'Kepo.id', url: 'https://kepo.id/' },
+];
+const TOPUP_INTERVAL = 5000; // ms
+(function () {
+  if (!TOPUP_STORES.length) return;
+  const link = document.getElementById('topupLink');
+  let cur = document.getElementById('tkA'), nxt = document.getElementById('tkB'), i = 0;
+  cur.textContent = TOPUP_STORES[0].name;
+  link.href = TOPUP_STORES[0].url;
+  if (TOPUP_STORES.length < 2) return;
+  setInterval(() => {
+    i = (i + 1) % TOPUP_STORES.length;
+    const s = TOPUP_STORES[i];
+    nxt.textContent = s.name;
+    nxt.className = 'snap below';   // taruh di bawah tanpa animasi
+    void nxt.offsetWidth;           // paksa reflow
+    nxt.className = 'cur';          // masuk dari bawah ke tengah
+    cur.className = 'above';        // yang lama geser naik keluar
+    link.href = s.url;
+    [cur, nxt] = [nxt, cur];
+  }, TOPUP_INTERVAL);
+})();
+
+// ── KUNCI SCROLL BACKGROUND saat modal apa pun terbuka (patch notes, grafik, daftar, event, profil) ──
+(function () {
+  const sel = '.modal-overlay, .pm-overlay, .maintenance-overlay';
+  const sync = () => document.documentElement.classList.toggle('scroll-lock', !!document.querySelector(
+    '.modal-overlay.active, .pm-overlay.active, .maintenance-overlay.active'));
+  const mo = new MutationObserver(sync);
+  document.querySelectorAll(sel).forEach(el => mo.observe(el, { attributes: true, attributeFilter: ['class'] }));
+  sync();
+})();
 </script>
-
 </body>
 </html>
