@@ -1544,7 +1544,7 @@
   const counterObserver = new IntersectionObserver(entries => {
     if (entries[0].isIntersecting) {
       animateCounter(document.getElementById('counter-member'), 12);
-      animateCounter(document.getElementById('counter-win'), 61, '%');
+      animateCounter(document.getElementById('counter-win'), 62, '%');
       animateCounter(document.getElementById('counter-season'), 40);
       counterObserver.disconnect();
     }
@@ -1621,7 +1621,7 @@ document.querySelectorAll('.sidebar-link').forEach(link => {
     this.classList.add('open');
   });
 });
-const MAINTENANCE = true; // ganti true/false aja
+const MAINTENANCE = false; // ganti true/false aja
 
 if (MAINTENANCE) {
   document.getElementById('maintenanceOverlay').classList.add('active');
